@@ -1,0 +1,17 @@
+package khanh.ntu.configs.copy;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // Khai báo: Cứ link nào có dạng /uploads/** thì map thẳng vào thư mục cứng trên máy tính
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:C:/gundam-store/uploads/"); 
+                // Thay "C:/gundam-store/uploads/" bằng đường dẫn thư mục chứa ảnh thực tế trên máy bạn
+    }
+}

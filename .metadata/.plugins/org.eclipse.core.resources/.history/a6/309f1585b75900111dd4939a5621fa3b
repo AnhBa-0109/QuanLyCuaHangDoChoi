@@ -1,0 +1,65 @@
+package khanh.ntu.services;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import khanh.ntu.Repositories.CategoryRepository;
+import khanh.ntu.Repositories.ProductRepository;
+import khanh.ntu.models.Category;
+
+@Service
+public class CategoryService {
+    @Autowired 
+    private CategoryRepository categoryRepository;
+    
+    @Autowired
+    private ProductRepository productRepository;
+
+    public List<Category> getAll() { 
+    	return categoryRepository.findAll(); 
+    }
+    
+    public Category getById(Integer id) { 
+    	return categoryRepository.findById(id).orElse(null); 
+    }
+    
+    public void save(Category cat) { 
+    	if (categoryRepository.existsByCategoryCode(cat.getCategoryCode())) {
+            throw new RuntimeException("Mã loại sản phẩm đã tồn tại!");
+        }
+    	categoryRepository.save(cat);
+    }
+    
+    public void edit(Category category) {
+        if (categoryRepository.existsByCategoryCodeAndCategoryIdNot(category.getCategoryCode(), category.getCategoryId())) {
+            throw new RuntimeException("Mã loại sản phẩm đã trùng với loại khác!");
+        }
+
+        Category existing = categoryRepository.findById(category.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy loại sản phẩm cần sửa!"));
+
+        existing.setCategoryName(category.getCategoryName());
+        existing.setCategoryCode(category.getCategoryCode());
+        categoryRepository.save(existing);
+    }
+    
+    public void delete(Integer id) {
+        long productCount = productRepository.countByCategoryId(id);
+        if (productCount > 0) {
+            throw new IllegalStateException("Không thể xóa Danh mục vì đang chứa " + productCount + " sản phẩm.");
+        }
+        categoryRepository.deleteById(id);
+    }
+
+    public Map<Integer, Long> getCategoryProductCountMap() {
+        return productRepository.countTotalProductsPerCategory().stream()
+                .collect(Collectors.toMap(
+                        row -> (Integer) row[0], 
+                        row -> (Long) row[1]
+                ));
+    }
+}

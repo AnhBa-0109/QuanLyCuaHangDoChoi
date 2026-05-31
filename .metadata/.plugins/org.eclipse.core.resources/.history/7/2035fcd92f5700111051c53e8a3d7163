@@ -1,0 +1,5 @@
+package khanh.ntu.Repositories;
+
+public interface CategoryRepository {
+
+}

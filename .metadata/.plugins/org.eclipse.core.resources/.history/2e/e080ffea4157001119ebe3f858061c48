@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head_info}"></head>
+
+<body class="bg-background-light dark:bg-background-dark h-screen flex overflow-hidden">
+
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="flex-1 flex flex-col min-w-0">
+        
+        <header th:replace="~{fragments/header :: header}"></header>
+        
+        <main class="flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-[1400px] mx-auto flex flex-col gap-6">
+
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-black text-text-primary dark:text-white tracking-tight">Danh sách Sản phẩm</h1>
+                        <p class="text-text-secondary text-sm mt-1">Quản lý kho hàng, giá cả và tình trạng sản phẩm.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <a th:href="@{/admin/create}">
+                            <button class="flex items-center gap-2 px-4 h-10 rounded bg-primary text-white text-sm font-bold">
+                                <span class="material-symbols-outlined">add</span> Thêm sản phẩm
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4 bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-border-light dark:border-gray-800 shadow-sm">
+					<div class="flex flex-col md:flex-row gap-4 justify-between">
+
+					    <div class="relative w-full md:max-w-md">
+		                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+		                        <span class="material-symbols-outlined text-text-secondary">search</span>
+		                    </div>
+		                    <input id="searchInput" class="block w-full pl-10 pr-3 h-10 text-sm rounded-lg bg-background-light dark:bg-gray-900 border-none focus:ring-2 focus:ring-primary/50 text-text-primary placeholder-text-secondary transition-shadow" placeholder="Tìm kiếm theo tên hoặc mã sản phẩm (SKU)..." type="text" />
+		                </div>
+					
+					    <div class="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+					        <select id="statusFilter" class="h-10 pl-3 pr-8 rounded-lg bg-background-light dark:bg-gray-900 border-none text-sm font-medium text-text-primary focus:ring-2 focus:ring-primary/50 cursor-pointer">
+					            <option value="">Tất cả trạng thái</option>
+					            <option value="in-stock" th:selected="${status == 'in-stock'}">Còn hàng</option>
+					            <option value="out-stock" th:selected="${status == 'out-stock'}">Hết hàng</option>
+					            <option value="low-stock" th:selected="${status == 'low-stock'}">Sắp hết</option>
+					            <option value="no-stock" th:selected="${status == 'no-stock'}">Ngừng bán</option>
+					        </select>
+					    </div>
+					</div>
+					
+					<div class="flex flex-wrap gap-2 pt-2 border-t border-border-light dark:border-gray-800">
+					    <span class="text-xs font-semibold text-text-secondary uppercase tracking-wider self-center mr-2">Danh mục:</span>
+					    
+					    <a th:href="@{/admin/products}" 
+					       class="px-3 py-1.5 rounded-full text-xs font-medium"
+					       th:classappend="${currentBrand == null and currentCategory == null ? 'bg-primary text-white' : 'bg-background-light text-text-secondary hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700'}">
+					        Tất cả
+					    </a>
+					    
+					    <a th:each="b : ${brands}" 
+					       th:href="@{/admin/products(brandId=${b.brandId})}" 
+					       class="px-3 py-1.5 rounded-full text-xs font-medium"
+					       th:classappend="${currentBrand == b.brandId ? 'bg-primary text-white' : 'bg-background-light text-text-secondary hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700'}"
+					       th:text="${b.brandName}">
+					    </a>
+					    
+					    <a th:each="c : ${categories}" 
+					       th:href="@{/admin/products(categoryId=${c.categoryId})}" 
+					       class="px-3 py-1.5 rounded-full text-xs font-medium"
+					       th:classappend="${currentCategory == c.categoryId ? 'bg-primary text-white' : 'bg-background-light text-text-secondary hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700'}"
+					       th:text="${c.categoryName}">
+					    </a>
+					</div>
+                </div>
+
+                <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse table-fixed">
+                            <thead> 
+                                <tr class="border-b border-border-light dark:border-gray-800 bg-background-light/50 dark:bg-gray-900/50">
+                                    <th class="p-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Sản phẩm</th>
+                                    <th class="p-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Danh mục</th>
+                                    <th class="p-4 text-xs font-semibold text-text-secondary uppercase tracking-wider text-right">Giá nhập</th>
+                                    <th class="p-4 text-xs font-semibold text-text-secondary uppercase tracking-wider text-right">Giá bán</th>
+                                    <th class="p-4 text-xs font-semibold text-text-secondary uppercase tracking-wider text-center">Số lượng</th>
+                                    <th class="p-4 text-xs font-semibold text-text-secondary uppercase tracking-wider text-center">Trạng thái</th>
+                                    <th class="p-4 text-xs font-semibold text-text-secondary uppercase tracking-wider text-right">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border-light dark:divide-gray-800">
+                                <tr th:each="item : ${products}" class="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                    <td class="p-4">
+                                    	<div class="h-20 w-20 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden flex-shrink-0">
+                                        	<img th:src="${#strings.isEmpty(item.imageUrl) ? '/images/default-image.png' : item.imageUrl}" class="w-12 h-12 rounded object-cover border border-border-light dark:border-gray-700" alt="Product image"/>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-text-primary dark:text-white line-clamp-1" th:text="${item.productName}"></p>
+                                            <p class="text-xs text-text-secondary font-mono" th:text="${item.productCode}"></p>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 text-sm text-text-secondary" th:text="${item.category != null ? item.category.categoryName : 'N/A'}"></td>
+                                    <td class="p-4 text-sm text-text-secondary text-right font-mono" th:text="${#numbers.formatDecimal(item.importPrice, 0, 'COMMA', 0, 'POINT')} + ' Đ'"></td>
+                                    <td class="p-4 text-sm font-semibold text-text-primary dark:text-white text-right font-mono" th:text="${#numbers.formatDecimal(item.sellPrice, 0, 'COMMA', 0, 'POINT')} + ' Đ'"></td>
+                                    <td class="p-4 text-sm text-text-primary dark:text-white text-center font-medium" th:text="${item.quantity}"></td>
+                                    <td class="p-4">
+                                        <span th:if="${item.quantity > 10}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Còn hàng</span>
+                                        <span th:if="${item.quantity > 0 && item.quantity < 10}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Sắp hết</span>
+                                        <span th:if="${item.quantity == 0 && item.isActive == 'true'}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">Hết hàng</span>
+                                    	<span th:unless="${item.isActive}" class= "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">Ngừng bán</span>
+                                    </td>
+                                    <td class="p-4 text-right text-sm font-medium">
+                                        <div class="flex justify-end gap-3">
+                                            <a th:href="@{/admin/edit/{id}(id=${item.productId})}" class="text-primary hover:underline flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-base">edit</span> Sửa
+                                            </a>
+                                            <a href="javascript:void(0);" th:onclick="'openDeleteModal(' + ${item.productId} + ')'" class="text-red-500 hover:underline flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-base">delete</span> Xóa
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(products)}">
+                                    <td colspan="8" class="p-8 text-center text-text-secondary text-sm">Không tìm thấy sản phẩm nào.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="deleteModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in">
+        <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-gray-800 shadow-xl max-w-sm w-full mx-4 flex flex-col gap-4">
+            <h3 class="text-lg font-bold text-text-primary dark:text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-red-500">warning</span> Xác nhận xóa
+            </h3>
+            <p class="text-text-secondary text-sm">Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác.</p>
+            <div class="flex justify-end gap-3 mt-2">
+                <button onclick="closeDeleteModal()" class="px-4 h-9 rounded bg-background-light dark:bg-gray-800 text-text-primary dark:text-white text-sm font-semibold hover:bg-border-light transition-colors">Hủy</button>
+                <button onclick="confirmDelete()" class="px-4 h-9 rounded bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        let deleteProductId = null;
+        const searchInput = document.getElementById('searchInput');
+
+        function openDeleteModal(id) {
+            deleteProductId = id;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            deleteProductId = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+        }
+
+        function confirmDelete() {
+            if (!deleteProductId) return;
+            // Chuyển hướng đến endpoint xóa sản phẩm của Spring Boot Controller
+            window.location.href = `/admin/delete/${deleteProductId}`;
+        }
+
+        function updateFilters() {
+            const search = searchInput.value.trim();
+            const category = document.getElementById('categoryFilter').value;
+            const brand = document.getElementById('brandFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            const url = new URL(window.location.href);
+            if (search) url.searchParams.set('search', search); else url.searchParams.delete('search');
+            if (category) url.searchParams.set('categoryId', category); else url.searchParams.delete('categoryId');
+            if (brand) url.searchParams.set('brandId', brand); else url.searchParams.delete('brandId');
+            if (status) url.searchParams.set('status', status); else url.searchParams.delete('status');
+            
+            url.searchParams.set('page', '1');
+            window.location.href = url.toString();
+        }
+
+        // Đăng ký sự kiện thay đổi bộ lọc tự động kích hoạt
+        document.getElementById('statusFilter').addEventListener('change', updateFilters);
+        document.getElementById('categoryFilter').addEventListener('change', updateFilters);
+        document.getElementById('brandFilter').addEventListener('change', updateFilters);
+        
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                updateFilters();
+            }
+        });
+    </script>
+</body>
+</html>

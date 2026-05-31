@@ -1,0 +1,18 @@
+package khanh.ntu.Repositories;
+
+import java.util.List;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import khanh.ntu.models.OrderDetail;
+import khanh.ntu.models.Product;
+
+public interface OrderDetailRepository extends JpaRepository<OrderDetail, Integer>{
+	@Query("SELECT od.product FROM OrderDetail od " +
+		       "WHERE od.product.isActive = true " +
+		       "GROUP BY od.product " +
+		       "ORDER BY SUM(od.quantity) DESC")
+		List<Product> findTopSellingProducts(Pageable pageable);
+}

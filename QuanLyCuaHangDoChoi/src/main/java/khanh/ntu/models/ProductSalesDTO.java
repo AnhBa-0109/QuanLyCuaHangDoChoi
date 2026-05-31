@@ -1,0 +1,27 @@
+package khanh.ntu.models;
+
+public class ProductSalesDTO {
+    private Product product;
+    private Long soldQuantity;
+
+    public ProductSalesDTO(Product product, Long soldQuantity) {
+        this.product = product;
+        this.soldQuantity = (soldQuantity != null) ? soldQuantity : 0L;
+    }
+
+    public Product getProduct() { 
+    	return product; 
+    }
+    
+    public void setProduct(Product product) { 
+    	this.product = product; 
+    }
+    
+    public Long getSoldQuantity() { 
+    	return soldQuantity; 
+    }
+    
+    public void setSoldQuantity(Long soldQuantity) { 
+    	this.soldQuantity = soldQuantity; 
+    }
+}

@@ -1,0 +1,197 @@
+package khanh.ntu.services;
+
+import khanh.ntu.Repositories.OrderDetailRepository;
+import khanh.ntu.Repositories.OrderRepository;
+import khanh.ntu.models.Order;
+import khanh.ntu.models.OrderDetail;
+import khanh.ntu.models.OrderDetailDTO;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@Service
+public class OrderService {
+    @Autowired 
+    private OrderRepository orderRepository;
+    
+    @Autowired 
+    private OrderDetailRepository detailRepository;
+
+    public List<Order> getAll() { 
+    	return orderRepository.findAll(); 
+    }
+    
+    public Order getById(Integer id) { 
+    	return orderRepository.findById(id).orElse(null); 
+    }
+    
+    public void save(Order order) {
+    	order.setOrderDate(LocalDateTime.now());
+    	order.setStatus(true);
+    	orderRepository.save(order); 
+    }
+    
+    public Order edit(Order order) {
+    	Order order1 = getById(order.getOrderId());
+    	order1.setCustomerName(order.getCustomerName());
+    	order1.setPaymentMethod(order.getPaymentMethod());
+    	order1.setStatus(order.getStatus());
+    	order1.setTotalAmount(order.getTotalAmount());
+    	
+    	return orderRepository.save(order1);
+    	
+    }
+    public void delete(Integer id) { 
+    	Order order = getById(id);
+    	order.setStatus(false);
+    	orderRepository.save(order);
+    }
+    
+    public Page<Order> searchAndFilterOrders(String search, LocalDate fromDate, LocalDate toDate, int page, int pageSize) {
+        LocalDateTime startDateTime = null;
+        LocalDateTime endDateTime = null;
+
+        if (fromDate != null) {
+            startDateTime = fromDate.atStartOfDay();
+        }
+        if (toDate != null) {
+            endDateTime = toDate.atTime(LocalTime.MAX);
+        }
+
+        String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
+
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("orderDate").descending());
+
+        return orderRepository.searchAndFilterOrders(searchParam, startDateTime, endDateTime, pageable);
+    }
+    
+    //doanh thu trong ngày
+    public double getTodayRevenue() {
+        LocalDateTime startOfToday = LocalDate.now().atStartOfDay(); 
+        LocalDateTime endOfToday = LocalDate.now().atTime(LocalTime.MAX);
+        
+        Double revenue = orderRepository.getRevenueBetween(startOfToday, endOfToday);
+        return (revenue != null) ? revenue : 0.0;
+    }
+    
+    //tổng đơn trong ngày
+    public int getTodayOrdersCount() {
+        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfToday = LocalDate.now().atTime(LocalTime.MAX);
+        
+        Integer count = orderRepository.countOrdersBetween(startOfToday, endOfToday);
+        return (count != null) ? count : 0;
+    }
+    
+    //doanh thu theo tuần
+    public Map<String, Double> getRevenueByWeek() {
+
+        Map<String, Double> weekData = new LinkedHashMap<>();
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+
+        for (int i = 6; i >= 0; i--) {
+            LocalDate date = today.minusDays(i);
+            LocalDateTime start = date.atStartOfDay();
+            LocalDateTime end = date.atTime(LocalTime.MAX);
+
+            Double revenue = orderRepository.getRevenueBetween(start, end);
+            String label = date.format(formatter); // Ví dụ: "24/05"
+            
+            weekData.put(label, (revenue != null) ? revenue : 0.0);
+        }
+        return weekData;
+    }
+    
+    //doanh thu theo tháng
+    public Map<String, Double> getRevenueByMonth() {
+        Map<String, Double> monthData = new LinkedHashMap<>();
+        LocalDate today = LocalDate.now();
+
+        for (int i = 4; i >= 1; i--) {
+
+            LocalDate startOfWeek = today.minusDays(i * 7 - 1);
+            LocalDate endOfWeek = today.minusDays((i - 1) * 7);
+
+            LocalDateTime start = startOfWeek.atStartOfDay();
+            LocalDateTime end = endOfWeek.atTime(LocalTime.MAX);
+
+            Double revenue = orderRepository.getRevenueBetween(start, end);
+
+            String label = "Tuần " + (5 - i);
+            
+            monthData.put(label, (revenue != null) ? revenue : 0.0);
+        }
+        return monthData;
+    }
+    
+    //doanh thu theo thời gian tùy chọn
+    public Map<String, Double> getRevenueCustomRange(LocalDate start, LocalDate end) {
+        Map<String, Double> customData = new LinkedHashMap<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+
+        LocalDate current = start;
+        while (!current.isAfter(end)) {
+            LocalDateTime startOfDay = current.atStartOfDay();
+            LocalDateTime endOfDay = current.atTime(java.time.LocalTime.MAX);
+
+            Double revenue = orderRepository.getRevenueBetween(startOfDay, endOfDay);
+            String label = current.format(formatter);
+            
+            customData.put(label, (revenue != null) ? revenue : 0.0);
+            
+            current = current.plusDays(1);
+        }
+        return customData;
+    }
+    
+    
+    public OrderDetail getOrderDetail(Integer orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        List<OrderDetail> details = detailRepository.findByOrder(order);
+
+        List<OrderDetailDTO.OrderItem> items = details.stream().map(d -> {
+        	OrderDetailDTO.OrderItem item = new OrderDetailDTO.OrderItem();
+            item.setProductName(d.getProduct().getProductName());
+            item.setProductCode(d.getProduct().getProductCode());
+            item.setImageUrl(d.getProduct().getImageUrl());
+            item.setBrandName(d.getProduct().getBrand().getBrandName());
+            item.setCategoryName(d.getProduct().getCategory().getCategoryName());
+            item.setPrice(d.getPrice());
+            item.setQuantity(d.getQuantity());
+            return item;
+        }).collect(Collectors.toList());
+
+        // Tính subTotal
+        int subTotal = items.stream()
+            .mapToInt(i -> i.getPrice() * i.getQuantity())
+            .sum();
+
+        // Map Order → OrderDetailVM
+        OrderDetailVM vm = new OrderDetailVM();
+        vm.setOrderId(order.getOrderId());
+        vm.setCustomerName(order.getCustomerName());
+        vm.setPaymentMethod(order.getPaymentMethod());
+        vm.setOrderDate(order.getOrderDate());
+        vm.setStaffName(order.getUser().getFullName()); // tuỳ field trong User
+        vm.setAvatarUrl(order.getUser().getAvatarUrl()); // tuỳ field trong User
+        vm.setSubTotal(subTotal);
+        vm.setTotal(order.getTotalAmount());
+        vm.setProducts(items);
+
+        return vm;
+    }
+}

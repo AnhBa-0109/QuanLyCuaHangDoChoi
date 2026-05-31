@@ -1,0 +1,82 @@
+package khanh.ntu.services;
+
+import khanh.ntu.Repositories.ProductRepository;
+import khanh.ntu.models.Product;
+import khanh.ntu.models.ProductSalesDTO;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class ProductService {
+    @Autowired 
+    private ProductRepository productRepository;
+    
+    @Autowired
+    private BrandService brandService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    public List<Product> getAll() { 
+    	return productRepository.findAll(); 
+    }
+    
+    public Product getById(Integer id) { 
+    	return productRepository.findById(id).orElse(null); 
+    }
+    
+    @Transactional
+    public void save(Product prod) {
+    	
+    	Product savedProd = productRepository.save(prod); 
+        
+        Integer brandId = savedProd.getBrand().getBrandId();
+        Integer categoryId = savedProd.getCategory().getCategoryId();
+        
+        String brandCode = brandService.getById(brandId).getBrandCode();
+        String categoryCode = categoryService.getById(categoryId).getCategoryCode();
+        
+        String generatedProductCode = String.format("%s-%s-%04d", brandCode, categoryCode, savedProd.getProductId());
+        
+        savedProd.setProductCode(generatedProductCode);
+        
+        productRepository.save(savedProd);
+    }
+    
+    public void delete(Integer id) { 
+    	Product product = productRepository.findById(id).orElse(null);
+    	
+    	if(product != null)
+    	{
+    		product.setQuantity(0);
+    		product.setIsActive(false);
+    	}
+    	productRepository.save(product);
+    }
+    
+    public Page<Product> getFilteredAndPaginatedProducts(Integer brandId, Integer categoryId, String keyword, String status, Pageable pageable) {
+        String cleanKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        String cleanStatus = (status != null && !status.trim().isEmpty()) ? status.trim() : null;
+        
+        return productRepository.findProductsWithFilters(brandId, categoryId, cleanKeyword, cleanStatus, pageable);
+    }
+    
+    public long countTotalProducts() {
+        return productRepository.countActiveProducts();
+    }
+
+    public long countLowStockProducts() {
+        return productRepository.countLowStockProducts();
+    }
+
+    public List<ProductSalesDTO> getTopSellingProducts(int limit) {
+        return productRepository.findTopSellingProducts(PageRequest.of(0, limit));
+    }
+}

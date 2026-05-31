@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="sidebar" class="w-64 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-gray-800 flex flex-col flex-shrink-0 z-20 h-screen">
+        <div class="h-16 flex items-center px-6 border-b border-border-light dark:border-gray-800">
+            <div class="flex items-center gap-2 text-primary">
+                <span class="material-symbols-outlined !text-3xl">smart_toy</span>
+                <span class="text-lg font-bold tracking-tight text-text-primary dark:text-white">AnhBar Hobby</span>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+            <div>
+                <p class="px-3 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">Management</p>
+                <nav class="flex flex-col gap-1">
+                    
+                    <a class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-background-light dark:hover:bg-gray-800 hover:text-text-primary transition-colors"
+                       th:href="@{/admin/dashboard}">
+                        <span class="material-symbols-outlined">dashboard</span>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    
+                    <a class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-background-light dark:hover:bg-gray-800 hover:text-text-primary transition-colors"
+                       th:href="@{/admin/products}">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                        <span class="text-sm font-medium">Sản phẩm</span>
+                    </a>
+                    
+                    <a class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-background-light dark:hover:bg-gray-800 hover:text-text-primary transition-colors"
+                       th:href="@{/admin/category}">
+                        <span class="material-symbols-outlined">category</span>
+                        <span class="text-sm font-medium">Danh mục sản phẩm</span>
+                    </a>
+                    
+                    <a class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-background-light dark:hover:bg-gray-800 hover:text-text-primary transition-colors"
+                       th:href="@{/admin/order}">
+                        <span class="material-symbols-outlined">shopping_cart</span>
+                        <span class="text-sm font-medium">Đơn hàng</span>
+                    </a>
+                    
+                    <a class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-background-light dark:hover:bg-gray-800 hover:text-text-primary transition-colors"
+                       th:href="@{/admin/employee}"
+                       th:if="${currentUser.roleU == 'Admin'}">
+                        <span class="material-symbols-outlined">badge</span>
+                        <span class="text-sm font-medium">Nhân viên</span>
+                    </a>
+                </nav>
+                
+                <p class="px-3 mt-4 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">User</p>
+                <nav class="flex flex-col gap-1">
+                    <a class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-background-light dark:hover:bg-gray-800 hover:text-text-primary transition-colors"
+                       th:href="@{/admin/profile}">
+                        <span class="material-symbols-outlined">person</span>
+                        <span class="text-sm font-medium">Thông tin cá nhân</span>
+                    </a>
+                    <a th:href="@{/login?logout}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-background-light dark:hover:bg-gray-800 hover:text-text-primary transition-colors">
+                        <span class="material-symbols-outlined">logout</span>
+                        <span class="text-sm font-medium">Đăng xuất</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const currentPath = window.location.pathname;
+                const navLinks = document.querySelectorAll(".nav-item");
+
+                navLinks.forEach(link => {
+                    const href = link.getAttribute("href");
+                    let isActive = false;
+
+                    if (currentPath === href) {
+                        isActive = true;
+                    } 
+                    else if (href && href.includes('/admin/products') && 
+                            (currentPath.includes('/admin/products') || currentPath.includes('/admin/create') || currentPath.includes('/admin/edit'))) {
+                        isActive = true;
+                    } 
+                    else if (href && href !== '#' && !href.includes('/admin/dashboard') && currentPath.startsWith(href)) {
+                        isActive = true;
+                    }
+
+                    if (isActive) {
+                        link.classList.remove("text-text-secondary", "hover:bg-background-light", "dark:hover:bg-gray-800", "hover:text-text-primary");
+                        link.classList.add("bg-primary/10", "text-primary");
+                    }
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

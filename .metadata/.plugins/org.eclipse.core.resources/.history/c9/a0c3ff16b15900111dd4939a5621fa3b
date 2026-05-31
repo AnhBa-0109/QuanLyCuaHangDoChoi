@@ -1,0 +1,90 @@
+package khanh.ntu.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import khanh.ntu.models.ProductSalesDTO;
+import khanh.ntu.models.User;
+import khanh.ntu.services.OrderService;
+import khanh.ntu.services.ProductService;
+import khanh.ntu.services.UserService;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Controller
+public class DashboardController {
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private OrderService orderService;
+    
+    @Autowired
+    private UserService userService;
+
+    @GetMapping({"/admin/dashboard"})
+    public String showDashboard(
+    		@RequestParam(value = "type", defaultValue = "week") String type,
+            @RequestParam(value = "startDate", required = false) String startDateStr,
+            @RequestParam(value = "endDate", required = false) String endDateStr,
+            ModelMap model) {
+    	
+    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String username = auth.getName();   
+	    User currentUser = userService.getByUsername(username);
+        Double revenue = orderService.getTodayRevenue();
+        double todayRevenue = (revenue != null) ? revenue : 0.0; 
+        
+        int todayOrders = orderService.getTodayOrdersCount();
+        long totalProducts = productService.countTotalProducts();
+        long lowStockProducts = productService.countLowStockProducts();
+
+        Map<String, Double> chartData;
+
+        if (startDateStr != null && endDateStr != null) {
+            LocalDate start = LocalDate.parse(startDateStr);
+            LocalDate end = LocalDate.parse(endDateStr);
+            
+            chartData = orderService.getRevenueCustomRange(start, end);
+            model.addAttribute("chartType", "custom");
+            model.addAttribute("startDate", startDateStr);
+            model.addAttribute("endDate", endDateStr);
+            model.addAttribute("currentUser", currentUser);
+        } else {
+            if ("month".equals(type)) {
+                chartData = orderService.getRevenueByMonth(); 
+            } else {
+                type = "week";
+                chartData = orderService.getRevenueByWeek(); 
+            }
+            model.addAttribute("chartType", type);
+        }
+        
+        List<String> revenueLabels = chartData.keySet().stream().collect(Collectors.toList());
+        List<Double> revenueValues = chartData.values().stream().collect(Collectors.toList());
+
+        List<ProductSalesDTO> topProducts = productService.getTopSellingProducts(5);      
+
+        model.addAttribute("todayRevenue", todayRevenue);
+        model.addAttribute("todayOrders", todayOrders);
+        model.addAttribute("totalProducts", totalProducts);
+        model.addAttribute("lowStockProducts", lowStockProducts);
+        model.addAttribute("topProducts", topProducts);
+        model.addAttribute("chartType", type);
+        model.addAttribute("revenueLabels", revenueLabels);
+        model.addAttribute("revenueValues", revenueValues);
+        
+        model.addAttribute("topProducts", topProducts);
+
+        return "dashboard_template/dashboard";
+    }
+}

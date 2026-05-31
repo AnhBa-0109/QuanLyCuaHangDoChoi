@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="top_header" class="admin-header-class">
+        <nav class="navbar navbar-dark bg-dark">
+            <span class="navbar-brand mb-0 h1">Gundam Store Admin</span>
+            <div>
+                <span class="text-white mr-3">Xin chào, Admin!</span>
+                <a th:href="@{/login}" class="btn btn-outline-light btn-sm">Đăng xuất</a>
+            </div>
+        </nav>
+    </div>
+</body>
+</html>

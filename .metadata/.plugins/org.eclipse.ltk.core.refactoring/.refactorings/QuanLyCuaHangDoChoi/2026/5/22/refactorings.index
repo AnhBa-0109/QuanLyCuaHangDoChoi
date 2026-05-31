@@ -1,0 +1,19 @@
+1779599067647	Rename type 'Categories'
+1779599690348	Rename package 'khanh.ntu.Repository'
+1779601440807	Delete element
+1779608156016	Rename package 'configs'
+1779608164185	Copy package
+1779608171387	Delete element
+1779608185749	Delete element
+1779630967396	Rename type 'MainController'
+1779697404554	Move 'createProduct.html' to 'product_template'
+1779697406883	Move 'editProduct.html' to 'product_template'
+1779697408863	Move 'productPage.html' to 'product_template'
+1779697422441	Move 'dashboard.html' to 'dashboard_template'
+1779697440105	Move 'orderPage.html' to 'order_template'
+1779697468201	Move 'categoryPage.html' to 'category_template'
+1779697476818	Move 'employeePage.html' to 'employee_template'
+1779863711062	Delete element
+1779874086550	Delete element
+1779874210916	Rename type 'UserDetailsService'
+1779878751604	Rename type 'PersonController'

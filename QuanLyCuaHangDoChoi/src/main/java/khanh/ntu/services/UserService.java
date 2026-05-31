@@ -1,0 +1,147 @@
+package khanh.ntu.services;
+
+import khanh.ntu.Repositories.UserRepository;
+import khanh.ntu.models.User;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class UserService {
+    @Autowired 
+    private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public List<User> getAll() { 
+    	return userRepository.findAll(); 
+    }
+    
+    public User getById(Integer id) { 
+    	return userRepository.findById(id).orElse(null); 
+    }
+    
+    //lưu avatar
+    public String uploadAvatar(MultipartFile avatarFile, Integer userId) {
+        if (avatarFile == null || avatarFile.isEmpty()) {
+            return "/Images/Employees/no-image.png";
+        }
+        try {
+            String uploadDir = "D:/Learn/Web Exercises/QuanLyCuaHangDoChoi/QuanLyCuaHangDoChoi/Images/Employees/";
+            Files.createDirectories(Paths.get(uploadDir));
+            
+            String originalFilename = avatarFile.getOriginalFilename();
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            
+            String fileName = "avatar_" + userId + extension;
+            
+            Path filePath = Paths.get(uploadDir + fileName);
+            Files.copy(avatarFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            return "/Images/Employees/" + fileName;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "/Images/Employees/no-image.png";
+        }
+    }
+    
+    //Lưu thông tin 
+    public void save(String username, String email, User user, MultipartFile avatarFile) throws Exception { 
+    	if(userRepository.findByUsername(username) != null)
+    	{
+    		throw new Exception("Tên đăng nhập này đã được đăng ký rồi!");
+    	}
+    	
+    	if(userRepository.existsByEmail(email))
+    	{
+    		throw new Exception("Email đã được dùng để đăng kí rồi!");
+    	}
+    	
+    	if (user.getPasswordU() != null && !user.getPasswordU().startsWith("$2a$")) {
+            user.setPasswordU(passwordEncoder.encode(user.getPasswordU()));
+        }
+    	
+    	User saveUser = userRepository.save(user);
+    	
+    	String avatarUrl = uploadAvatar(avatarFile, saveUser.getUserId());
+    	saveUser.setAvatarUrl(avatarUrl);
+    	saveUser.setIsActive(true);
+        userRepository.save(saveUser); 
+    }
+    
+    //xóa mềm nhân viên
+    public void delete(Integer Id) {
+    	User user = userRepository.findById(Id).orElse(null);
+    	if(user != null)
+    	{
+    		user.setIsActive(false);
+    		userRepository.save(user);
+    	}
+    }
+    
+    //sửa thông tin
+    public void update(User user, MultipartFile avatarFile) {
+        User existingUser = userRepository.findById(user.getUserId()).orElse(null);
+        if (existingUser == null) return;
+
+
+        if (user.getFullName() != null) existingUser.setFullName(user.getFullName());
+        if (user.getPhone() != null) existingUser.setPhone(user.getPhone());
+        if (user.getEmail() != null) existingUser.setEmail(user.getEmail());
+        if (user.getSex() != null) existingUser.setSex(user.getSex());
+        if (user.getbDay() != null) existingUser.setbDay(user.getbDay());
+
+        if (user.getRoleU() != null) {
+            existingUser.setRoleU(user.getRoleU());
+        }
+        if (user.getIsActive() != null) {
+            existingUser.setIsActive(user.getIsActive());
+        }
+
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            String avatarUrl = uploadAvatar(avatarFile, existingUser.getUserId());
+            existingUser.setAvatarUrl(avatarUrl);
+        }
+
+        userRepository.save(existingUser);
+    }
+    
+    public boolean checkOldPassword(String rawPassword, String encodedPasswordInDb) {
+        return passwordEncoder.matches(rawPassword, encodedPasswordInDb);
+    }
+
+    public void updateUserPassword(User user, String newPassword) {
+        user.setPasswordU(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+    
+    public User login(String username, String password) {
+        User user = userRepository.findByUsername(username);
+        if (user != null && passwordEncoder.matches(password, user.getPasswordU())) {
+            return user;
+        }
+        return null;
+    }
+    
+
+    public long countActiveUsers() {
+        return userRepository.findAll().stream()
+                .filter(u -> Boolean.TRUE.equals(u.getIsActive()))
+                .count();
+    }
+    
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+}

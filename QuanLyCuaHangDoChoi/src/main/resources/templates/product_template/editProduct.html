@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head_info}"></head>
+
+<body class="bg-background-light dark:bg-background-dark h-screen flex overflow-hidden">
+
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="flex-1 flex flex-col min-w-0">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <div class="max-w-10xl p-8">
+		    <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+		        <div class="flex flex-col gap-1">
+		            <h1 class="text-[#111418] dark:text-white text-2xl font-black leading-tight tracking-[-0.033em]">Chỉnh sửa sản phẩm</h1>
+		            <p class="text-[#637588] dark:text-gray-400 text-base font-normal leading-normal">Xem và chỉnh sửa thông tin của sản phẩm</p>
+		        </div>
+		    </div>
+		    
+		    <form th:action="@{/admin/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+		        <input type="hidden" th:field="*{productId}" />
+		        <input type="hidden" th:field="*{imageUrl}" />
+		        <input type="hidden" th:field="*{productCode}" />
+		        
+		        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 m-b-3">
+		            <div class="lg:col-span-5 flex flex-col gap-4">
+		                <div class="w-full bg-surface-light dark:bg-surface-dark rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+		                    <div class="relative w-full aspect-square rounded-lg overflow-hidden bg-white dark:bg-gray-800 mb-4 border border-gray-100 dark:border-gray-700 group">
+		                        <div class="w-full h-full bg-center bg-contain bg-no-repeat" th:style="'background-image: url(' + *{imageUrl} + ');'"></div>
+		                        <input type="file" id="productImageInput" name="ProductImage" accept="image/*" class="hidden" />
+		                        <div onclick="document.getElementById('productImageInput').click()" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+		                            <span class="material-symbols-outlined text-white text-4xl">edit</span>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+		            <div class="lg:col-span-7">
+		                <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 h-full">
+		                    <h3 class="text-[#111418] dark:text-white text-xl font-bold mb-6 pb-2 border-b border-gray-100 dark:border-gray-700">Thông tin chung</h3>
+		                    <div class="flex flex-col gap-6">
+		                        <label class="flex flex-col flex-1">
+		                            <p class="text-[#111418] dark:text-white text-base font-medium leading-normal pb-2">Tên sản phẩm</p>
+		                            <input th:field="*{productName}" class="form-input flex w-full flex-1 resize-none overflow-hidden rounded-lg text-[#111418] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-[#dce0e5] dark:border-gray-600 bg-white dark:bg-gray-800 focus:border-primary h-12 placeholder:text-[#637588] px-4 text-base font-normal leading-normal transition-all" />
+		                        </label>
+		                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+		                            <label class="flex flex-col flex-1">
+		                                <p class="text-[#111418] dark:text-white text-base font-medium leading-normal pb-2">Brand</p>
+		                                <div class="relative">
+		                                    <select th:field="*{brand.brandId}"
+		                                            class="form-select flex w-full flex-1 appearance-none rounded-lg
+		                                               text-[#111418] dark:text-white
+		                                               focus:outline-0 focus:ring-2 focus:ring-primary/20
+		                                               border border-[#dce0e5] dark:border-gray-600
+		                                               bg-white dark:bg-gray-800
+		                                               focus:border-primary h-12 px-4
+		                                               text-base font-normal leading-normal
+		                                               transition-all cursor-pointer">
+		                                        <option value="">-- Chọn Brand --</option>
+		                                        <option th:each="b : ${brands}" th:value="${b.brandId}" th:text="${b.brandName}"></option>
+		                                    </select>
+		                                </div>
+		                            </label>
+		                            <label class="flex flex-col flex-1">
+		                                <p class="text-[#111418] dark:text-white text-base font-medium leading-normal pb-2">Loại</p>
+		                                <div class="relative">
+		                                    <select th:field="*{category.categoryId}"
+		                                            class="form-select flex w-full flex-1 appearance-none rounded-lg
+		                                               text-[#111418] dark:text-white
+		                                               focus:outline-0 focus:ring-2 focus:ring-primary/20
+		                                               border border-[#dce0e5] dark:border-gray-600
+		                                               bg-white dark:bg-gray-800
+		                                               focus:border-primary h-12 px-4
+		                                               text-base font-normal leading-normal
+		                                               transition-all cursor-pointer">
+		                                        <option value="">-- Chọn Category --</option>
+		                                        <option th:each="c : ${categories}" th:value="${c.categoryId}" th:text="${c.categoryName}"></option>
+		                                    </select>
+		                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#637588]">
+		                                        <span class="material-symbols-outlined">expand_more</span>
+		                                    </div>
+		                                </div>
+		                            </label>
+		                        </div>
+		                        <div class="h-px bg-gray-100 dark:bg-gray-700 my-2"></div>
+		                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+		                            <label class="flex flex-col flex-1">
+		                                <p class="text-[#111418] dark:text-white text-base font-medium leading-normal pb-2">Giá nhập</p>
+		                                <div class="relative">
+		                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[#637588]">₫</span>
+		                                    <input type="number" th:field="*{importPrice}" class="form-input flex w-full flex-1 resize-none overflow-hidden rounded-lg text-[#111418] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-[#dce0e5] dark:border-gray-600 bg-white dark:bg-gray-800 focus:border-primary h-12 placeholder:text-[#637588] pl-8 pr-4 text-base font-normal leading-normal transition-all" />
+		                                </div>
+		                            </label>
+		                            <label class="flex flex-col flex-1">
+		                                <p class="text-[#111418] dark:text-white text-base font-medium leading-normal pb-2">Giá bán</p>
+		                                <div class="relative">
+		                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-[#637588]">₫</span>
+		                                    <input type="number" th:field="*{sellPrice}" class="form-input flex w-full flex-1 resize-none overflow-hidden rounded-lg text-[#111418] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-[#dce0e5] dark:border-gray-600 bg-white dark:bg-gray-800 focus:border-primary h-12 placeholder:text-[#637588] pl-8 pr-4 text-base font-bold leading-normal transition-all" />
+		                                </div>
+		                            </label>
+		                        </div>
+		                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+		                            <label class="flex flex-col flex-1">
+		                                <p class="text-[#111418] dark:text-white text-base font-medium leading-normal pb-2">Tồn kho</p>
+		                                <div class="relative">
+		                                    <input th:field="*{quantity}" class="form-input flex w-full flex-1 resize-none overflow-hidden rounded-lg text-[#111418] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-[#dce0e5] dark:border-gray-600 bg-white dark:bg-gray-800 focus:border-primary h-12 placeholder:text-[#637588] px-4 text-base font-normal leading-normal transition-all" type="number" />
+		                                    
+		                                    <div th:if="*{quantity &gt; 10}" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+		                                        <span class="text-xs text-green-600 font-medium bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded">Còn hàng</span>
+		                                    </div>
+		                                    <div th:if="*{quantity &gt; 0 && quantity &lt;= 10}" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+		                                        <span class="text-xs text-yellow-600 font-medium bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded">Sắp hết</span>
+		                                    </div>
+		                                    <div th:if="*{quantity &lt;= 0 || quantity == null}" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+		                                        <span class="text-xs text-red-600 font-medium bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded">Hết hàng</span>
+		                                    </div>
+		                                </div>
+		                            </label>
+		                            <label class="flex flex-col flex-1">
+		                                <p class="text-[#111418] dark:text-white text-base font-medium leading-normal pb-2">SKU</p>
+		                                <div class="relative">
+		                                    <input th:value="*{productCode}" class="form-input flex w-full flex-1 resize-none overflow-hidden rounded-lg text-[#637588] dark:text-gray-400 focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-[#dce0e5] dark:border-gray-600 bg-gray-50 dark:bg-gray-900 focus:border-primary h-12 placeholder:text-[#637588] px-4 text-base font-mono font-normal leading-normal transition-all" readonly="" type="text" />
+		                                    <span class="absolute right-3 top-3 text-[#637588] cursor-pointer hover:text-primary material-symbols-outlined text-xl">content_copy</span>
+		                                </div>
+		                            </label>
+		                        </div>
+		                        <div class="flex gap-3">
+		                            <a th:href="@{/admin/products}">
+		                                <button type="button" class="flex min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 flex-1 bg-surface-light dark:bg-surface-dark text-[#111418] dark:text-white text-sm font-bold leading-normal tracking-[0.015em] border border-[#dce0e5] dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+		                                    <span class="truncate">Hủy</span>
+		                                </button>
+		                            </a>
+		                            <button class="flex min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 flex-1 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-blue-600 transition-colors shadow-sm" type="submit">
+		                                <span class="truncate">Cập nhật</span>
+		                            </button>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		    </form>
+		</div>
+	</div>
+    <script>
+	    const input = document.getElementById('productImageInput');
+	    const preview = document.querySelector('[style*="background-image"]');
+	
+	    input.addEventListener('change', function () {
+	        if (this.files && this.files[0]) {
+	            const reader = new FileReader();
+	            reader.onload = e => {
+	                preview.style.backgroundImage = `url(${e.target.result})`;
+	            };
+	            reader.readAsDataURL(this.files[0]);
+	        }
+	    });
+	</script>
+</body>
+</html>

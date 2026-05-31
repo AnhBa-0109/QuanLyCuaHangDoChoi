@@ -1,0 +1,11 @@
+package khanh.ntu.models;
+
+import org.springframework.web.bind.annotation.GetMapping;
+
+
+public class AuthController {
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "login";
+    }
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head_info}"></head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <div th:replace="~{fragments/sidebar :: left_sidebar}"></div>
+        <div class="flex-1 flex flex-col h-screen overflow-y-auto">
+            <div th:replace="~{fragments/header :: top_header}"></div>
+            
+            <div class="p-8">
+                <h1 class="text-2xl font-black mb-6">Thêm Sản phẩm Mới</h1>
+                
+                <form th:action="@{/admin/products/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col gap-6">
+                        
+                        <label class="flex flex-col gap-2">
+                            <span class="text-sm font-semibold">Tên sản phẩm *</span>
+                            <input type="text" th:field="*{productName}" required class="h-12 px-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none" />
+                        </label>
+
+                        <div class="grid grid-cols-2 gap-6">
+                            <label class="flex flex-col gap-2">
+                                <span class="text-sm font-semibold">Thương hiệu</span>
+                                <select th:field="*{brand.brandId}" class="h-12 px-4 rounded-lg border border-gray-300 outline-none cursor-pointer">
+                                    <option value="">-- Chọn Brand --</option>
+                                    <option th:each="b : ${brands}" th:value="${b.brandId}" th:text="${b.brandName}"></option>
+                                </select>
+                            </label>
+
+                            <label class="flex flex-col gap-2">
+                                <span class="text-sm font-semibold">Danh mục</span>
+                                <select th:field="*{category.categoriesId}" class="h-12 px-4 rounded-lg border border-gray-300 outline-none cursor-pointer">
+                                    <option value="">-- Chọn Loại --</option>
+                                    <option th:each="c : ${categories}" th:value="${c.categoriesId}" th:text="${c.categoriesName}"></option>
+                                </select>
+                            </label>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-6">
+                            <label class="flex flex-col gap-2">
+                                <span class="text-sm font-semibold">Giá nhập (VNĐ)</span>
+                                <input type="number" th:field="*{importPrice}" class="h-12 px-4 rounded-lg border border-gray-300 outline-none" />
+                            </label>
+                            <label class="flex flex-col gap-2">
+                                <span class="text-sm font-semibold">Giá bán (VNĐ)</span>
+                                <input type="number" th:field="*{sellPrice}" class="h-12 px-4 rounded-lg border border-gray-300 outline-none" />
+                            </label>
+                            <label class="flex flex-col gap-2">
+                                <span class="text-sm font-semibold">Số lượng</span>
+                                <input type="number" th:field="*{quantity}" class="h-12 px-4 rounded-lg border border-gray-300 outline-none" />
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end mt-4">
+                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">Lưu sản phẩm</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head_info}"></head>
+
+<body class="bg-background-light dark:bg-background-dark h-screen flex overflow-hidden">
+
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <div class="flex-1 flex flex-col min-w-0">
+        
+		<header th:replace="~{fragments/header :: header}"></header>
+		<main class="flex-1 flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative">
+			<div class="flex-1 flex flex-col gap-4 overflow-y-auto bg-background-light dark:bg-background-dark p-4 md:p-8">
+			    <div class="flex flex-col gap-2">
+			        <h1 class="text-2xl font-black text-text-primary dark:text-white tracking-tight">Hồ sơ của tôi</h1>
+			    </div>
+			    
+			    <form th:action="@{/admin/profile/update}" th:object="${currentUser}" method="POST" enctype="multipart/form-data">
+			        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+			            <div class="lg:col-span-1 space-y-6">
+			                <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-gray-800 shadow-sm p-6 flex flex-col items-center">
+			                    <div class="relative group cursor-pointer mb-4" id="avatarContainer">
+			                        <div id="avatarPreview" class="size-32 rounded-full bg-cover bg-center border-4 border-white dark:border-surface-dark shadow-md" 
+			                             th:style="'background-image: url(\'' + (${currentUser.avatarUrl} != null ? ${currentUser.avatarUrl} : '/images/default-avatar.png') + '\');'">
+			                        </div>
+			                        <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+			                            <span class="material-symbols-outlined text-white">camera_alt</span>
+			                        </div>
+			                        <input type="file" id="avatarInput" name="AvatarFile" class="hidden" accept="image/*" />
+			                    </div>
+			                    <div class="mt-4 text-center">
+			                        <h2 class="text-xl font-bold text-text-primary dark:text-white" th:text="${currentUser.fullName}">Họ và tên</h2>
+			                        
+			                        <p th:if="${currentUser.roleU == 'Admin'}" class="text-text-secondary text-sm mt-1">Chủ cửa hàng</p>
+			                        <p th:if="${currentUser.roleU != 'Admin'}" class="text-text-secondary text-sm mt-1">Nhân viên</p>
+			                    </div>
+			                </div>
+			                <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-gray-800 shadow-sm p-4">
+			                    <h3 class="text-sm font-bold text-text-primary dark:text-white mb-3 px-2">Bảo mật</h3>
+			                    <div class="space-y-1">
+			                        <button type="button" th:onclick="'openModal(' + ${currentUser.userId} + ')'" 
+			                                class="w-full flex items-center gap-3 px-2 py-2 text-sm text-text-secondary hover:text-primary hover:bg-background-light dark:hover:bg-gray-800 rounded-lg transition-colors text-left">
+			                            <span class="material-symbols-outlined !text-xl">lock_reset</span>
+			                            Đổi mật khẩu
+			                        </button>
+			                    </div>
+			                </div>
+			            </div>
+			            <div class="lg:col-span-2">
+			                <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-gray-800 shadow-sm overflow-hidden">
+			                    <div class="px-6 py-4 border-b border-border-light dark:border-gray-800 flex justify-between items-center bg-background-light/30 dark:bg-gray-900/30">
+			                        <h3 class="font-bold text-text-primary dark:text-white flex items-center gap-2">
+			                            <span class="material-symbols-outlined text-primary">person</span>
+			                            Thông tin chi tiết
+			                        </h3>
+			                        <button type="submit" class="text-sm font-medium text-primary hover:text-blue-600 flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-primary/10 transition-colors">
+			                            <span class="material-symbols-outlined !text-sm">edit</span>
+			                            Lưu
+			                        </button>
+			                    </div>
+			                    <div class="p-6">
+			                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+			                            <div class="col-span-1 md:col-span-2">
+			                                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Họ và tên</label>
+			                                <div class="relative">
+			                                    <input name="fullName" th:value="${currentUser.fullName}" class="block w-full h-11 px-3 py-2 bg-background-light dark:bg-gray-900 border border-transparent focus:bg-white dark:focus:bg-gray-800 focus:border-primary/50 focus:ring-0 rounded-lg text-text-primary dark:text-white font-medium sm:text-sm transition-all" type="text" />
+			                                </div>
+			                            </div>
+			                            <div class="col-span-1">
+			                                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Mã nhân viên</label>
+			                                <div class="relative">
+			                                    <input name="userId" th:value="${currentUser.userId}" class="block w-full h-11 px-3 py-2 bg-background-light dark:bg-gray-900 border border-transparent rounded-lg text-text-primary dark:text-white sm:text-sm font-mono text-opacity-80 cursor-default focus:outline-none focus:ring-0 focus:border-border-light" readonly type="text" />
+			                                    <span class="absolute right-3 top-3 text-text-secondary material-symbols-outlined !text-lg">badge</span>
+			                                </div>
+			                            </div>
+			                            <div class="col-span-1">
+			                                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Tên đăng nhập</label>
+			                                <div class="relative">
+			                                    <input name="username" th:value="${currentUser.username}" class="block w-full h-11 px-3 py-2 bg-background-light dark:bg-gray-900 border border-transparent rounded-lg text-text-primary dark:text-white sm:text-sm font-mono text-opacity-80 cursor-default focus:outline-none focus:ring-0 focus:border-border-light" readonly type="text" />
+			                                </div>
+			                            </div>
+			                            <div class="col-span-1">
+			                                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Số điện thoại</label>
+			                                <div class="relative">
+			                                    <input name="phone" th:value="${currentUser.phone}" class="block w-full h-11 px-3 py-2 bg-background-light dark:bg-gray-900 border border-transparent focus:bg-white dark:focus:bg-gray-800 focus:border-primary/50 focus:ring-0 rounded-lg text-text-primary dark:text-white sm:text-sm transition-all" type="text" />
+			                                    <span class="absolute right-3 top-3 text-text-secondary material-symbols-outlined !text-lg">phone</span>
+			                                </div>
+			                            </div>
+			                            <div class="col-span-1">
+			                                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Email</label>
+			                                <div class="relative">
+			                                    <input name="email" th:value="${currentUser.email}" class="block w-full h-11 px-3 py-2 bg-background-light dark:bg-gray-900 border border-transparent focus:bg-white dark:focus:bg-gray-800 focus:border-primary/50 focus:ring-0 rounded-lg text-text-primary dark:text-white sm:text-sm transition-all" type="email" />
+			                                    <span class="absolute right-3 top-3 text-text-secondary material-symbols-outlined !text-lg">mail</span>
+			                                </div>
+			                            </div>
+			                            <div class="col-span-1">
+			                                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Giới tính</label>
+			                                <select name="sex" class="block w-full rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark/50 text-text-main-light dark:text-text-main-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm h-11 px-3">
+			                                    <option value="true" th:selected="${currentUser.sex == true}">Nam</option>
+			                                    <option value="false" th:selected="${currentUser.sex == false}">Nữ</option>
+			                                </select>
+			                            </div>
+			                            <div class="col-span-1">
+			                                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Ngày sinh</label>
+			                                <div class="relative">
+			                                    <input name="bDay" th:value="${currentUser.bDay != null ? #temporals.format(currentUser.bDay, 'yyyy-MM-dd') : ''}" class="block w-full h-11 px-3 py-2 bg-background-light dark:bg-gray-900 border border-transparent focus:bg-white dark:focus:bg-gray-800 focus:border-primary/50 focus:ring-0 rounded-lg text-text-primary dark:text-white sm:text-sm transition-all" type="date" />
+			                                </div>
+			                            </div>
+			                            <div class="col-span-1 md:col-span-2">
+			                                <label class="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Chức vụ</label>
+			                                <div class="relative">
+			                                    <div class="flex items-center gap-2 w-full h-11 px-3 py-2 bg-background-light dark:bg-gray-900 border border-transparent rounded-lg text-text-primary dark:text-white sm:text-sm">
+			                                        <span class="material-symbols-outlined text-primary !text-lg">verified_user</span>
+			                                        <span class="font-medium" th:text="${currentUser.roleU == 'Admin' ? 'Chủ cửa hàng' : 'Nhân viên'}">Chức vụ</span>
+			                                    </div>
+			                                </div>
+			                            </div>
+			                        </div>
+			                    </div>
+			                </div>
+			            </div>
+			        </div>
+			    </form> 
+			</div>
+			
+			<div id="Modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+			    <div class="bg-white dark:bg-surface-dark rounded-xl p-6 w-96 flex flex-col gap-3">
+			        <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Đổi mật khẩu</h3>
+			
+			        <div class="relative w-full">
+			            <label class="block text-sm font-medium mb-1.5 text-[#111418] dark:text-white">Mật khẩu hiện tại</label>
+			            <div class="relative flex items-center">
+			                <span class="material-symbols-outlined absolute left-4 text-[#637588] z-10">lock</span>
+			                <input id="OldPasswordInput" type="password"
+			                       class="w-full h-14 pl-12 pr-12 rounded-lg border border-[#dce0e5] dark:border-gray-700 bg-white dark:bg-gray-800 text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+			                       placeholder="Nhập mật khẩu cũ" />
+			                <button type="button" onclick="togglePassword('OldPasswordInput', this)"
+			                        class="absolute right-4 text-[#637588] hover:text-primary transition-colors flex items-center">
+			                    <span class="material-symbols-outlined">visibility</span>
+			                </button>
+			            </div>
+			        </div>
+			
+			        <div class="relative w-full">
+			            <label class="block text-sm font-medium mb-1.5 text-[#111418] dark:text-white">Mật khẩu mới</label>
+			            <div class="relative flex items-center">
+			                <span class="material-symbols-outlined absolute left-4 text-[#637588] z-10">lock</span>
+			                <input id="NewPasswordInput" type="password"
+			                       class="w-full h-14 pl-12 pr-12 rounded-lg border border-[#dce0e5] dark:border-gray-700 bg-white dark:bg-gray-800 text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+			                       placeholder="Nhập mật khẩu mới" />
+			                <button type="button" onclick="togglePassword('NewPasswordInput', this)"
+			                        class="absolute right-4 text-[#637588] hover:text-primary transition-colors flex items-center">
+			                    <span class="material-symbols-outlined">visibility</span>
+			                </button>
+			            </div>
+			        </div>
+			
+			        <div class="relative w-full">
+			            <label class="block text-sm font-medium mb-1.5 text-[#111418] dark:text-white">Xác nhận mật khẩu mới</label>
+			            <div class="relative flex items-center">
+			                <span class="material-symbols-outlined absolute left-4 text-[#637588] z-10">lock</span>
+			                <input id="ConfirmPasswordInput" type="password"
+			                       class="w-full h-14 pl-12 pr-12 rounded-lg border border-[#dce0e5] dark:border-gray-700 bg-white dark:bg-gray-800 text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+			                       placeholder="Nhập lại mật khẩu mới" />
+			                <button type="button" onclick="togglePassword('ConfirmPasswordInput', this)"
+			                        class="absolute right-4 text-[#637588] hover:text-primary transition-colors flex items-center">
+			                    <span class="material-symbols-outlined">visibility</span>
+			                </button>
+			            </div>
+			        </div>
+			
+			        <div class="flex justify-end gap-2 mt-4">
+			            <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-lg text-gray-700 dark:text-gray-300 dark:border-gray-600">Hủy</button>
+			            <button type="button" onclick="saveItem()" class="px-4 py-2 bg-primary text-white rounded-lg">Lưu</button>
+			        </div>
+			    </div>
+			</div>
+		</main>
+	</div>
+	<script>
+	    let currentId = null;
+	    const avatarContainer = document.getElementById("avatarContainer");
+	    const avatarInput = document.getElementById("avatarInput");
+	    const avatarPreview = document.getElementById("avatarPreview");
+	
+	    avatarContainer.addEventListener("click", function () {
+	        avatarInput.click();
+	    });
+	
+	    avatarInput.addEventListener("change", function (event) {
+	        const file = event.target.files[0];
+	        if (file) {
+	            const reader = new FileReader();
+	            reader.onload = function (e) {
+	                avatarPreview.style.backgroundImage = `url('${e.target.result}')`;
+	            }
+	            reader.readAsDataURL(file);
+	        }
+	    });
+	
+	    function openModal(id) {
+	        currentId = id;
+	        document.getElementById('OldPasswordInput').value = '';
+	        document.getElementById('NewPasswordInput').value = '';
+	        document.getElementById('ConfirmPasswordInput').value = '';
+	        
+	        document.getElementById('Modal').classList.remove('hidden');
+	        document.getElementById('Modal').classList.add('flex');
+	    }
+	
+	    function closeModal() {
+	        document.getElementById('Modal').classList.add('hidden');
+	        document.getElementById('Modal').classList.remove('flex');
+	    }
+	
+	    function saveItem() {
+	        const oPass = document.getElementById('OldPasswordInput').value;
+	        const nPass = document.getElementById('NewPasswordInput').value;
+	        const cPass = document.getElementById('ConfirmPasswordInput').value;
+	
+	        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+	
+	        if (!oPass || !nPass || !cPass) {
+	            Swal.fire('Thông báo', 'Không được để trống!', 'error');
+	            return;
+	        }
+	
+	        if (!passwordRegex.test(nPass)) {
+	            Swal.fire({
+	                title: 'Mật khẩu yếu!',
+	                text: 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm cả chữ hoa, chữ thường và chữ số.',
+	                icon: 'warning',
+	                confirmButtonText: 'Ok'
+	            });
+	            return;
+	        }
+	
+	        if (nPass == oPass) {
+	            Swal.fire({
+	                title: 'Trùng mật khẩu!',
+	                text: 'Mật khẩu mới phải khác với mật khẩu hiện tại!',
+	                icon: 'warning',
+	                confirmButtonText: 'Ok'
+	            });
+	            return;
+	        }
+	
+	        if (nPass != cPass) {
+	            Swal.fire('Thông báo', 'Mật khẩu xác nhận chưa khớp!', 'error');
+	            return;
+	        }
+	
+	        // Thay đổi URL API cho chuẩn định dạng Spring Boot RESTful
+	        const url = '/admin/profile/update-password';
+	
+	        const bodyData = {
+	            userId: currentId, // Truyền kèm ID người dùng nếu backend cần xác thực
+	            oldPass: oPass,
+	            newPass: nPass
+	        };
+	
+	        fetch(url, {
+	            method: 'POST',
+	            headers: { 'Content-Type': 'application/json' },
+	            body: JSON.stringify(bodyData)
+	        })
+	        .then(res => res.json())
+	        .then(data => {
+	            if (data.error) {
+	                Swal.fire('Lỗi!', data.error, 'error');
+	                return;
+	            }
+	
+	            closeModal();
+	
+	            Swal.fire({
+	                title: 'Thành công!',
+	                text: 'Mật khẩu đã được thay đổi.',
+	                icon: 'success',
+	                confirmButtonText: 'OK'
+	            }).then((result) => {
+	                if (result.isConfirmed) {
+	                    window.location.reload();
+	                }
+	            });
+	        })
+	        .catch(err => {
+	            console.error(err);
+	            alert("Có lỗi xảy ra: " + err.message);
+	        });
+	    }
+	
+	    function togglePassword(inputId, btn) {
+	        const input = document.getElementById(inputId);
+	        const icon = btn.querySelector('.material-symbols-outlined');
+	
+	        if (input.type === 'password') {
+	            input.type = 'text';
+	            icon.innerText = 'visibility_off';
+	        } else {
+	            input.type = 'password';
+	            icon.innerText = 'visibility';
+	        }
+	    }
+	</script>	
+</body>
+</html>

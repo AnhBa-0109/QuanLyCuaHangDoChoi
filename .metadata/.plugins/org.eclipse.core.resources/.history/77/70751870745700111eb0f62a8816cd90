@@ -1,0 +1,18 @@
+package khanh.ntu.Repositories;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import khanh.ntu.models.Product;
+
+public interface ProductRepository extends JpaRepository<Product, Integer>{
+	List<Product> findByBrandBrandId(Integer brandId);
+
+    List<Product> findByCategoryCategoryId(Integer categoryId);
+    
+    List<Product> findByBrandBrandIdAndCategoryCategoryId(Integer brandId, Integer categoryId);
+    Page<Product> findByProductNameAndSKU(String name, String code, Pageable pageable);
+}

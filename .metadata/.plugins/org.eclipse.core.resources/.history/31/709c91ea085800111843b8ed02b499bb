@@ -1,0 +1,46 @@
+package khanh.ntu.services;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import khanh.ntu.Repositories.CategoryRepository;
+import khanh.ntu.models.Category;
+
+@Service
+public class CategoryService {
+    @Autowired 
+    private CategoryRepository categoryRepository;
+
+    public List<Category> getAll() { 
+    	return categoryRepository.findAll(); 
+    }
+    
+    public Category getById(Integer id) { 
+    	return categoryRepository.findById(id).orElse(null); 
+    }
+    
+    public void save(Category cat) { 
+    	if (categoryRepository.existsByCategoryCode(cat.getCategoryCode())) {
+            throw new RuntimeException("Mã loại sản phẩm đã tồn tại!");
+        }
+    }
+    
+    public void edit(Category category) {
+        if (categoryRepository.existsByCategoryCodeAndCategoryIdNot(category.getCategoryCode(), category.getCategoryId())) {
+            throw new RuntimeException("Mã loại sản phẩm đã trùng với loại khác!");
+        }
+
+        Category existing = categoryRepository.findById(category.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy loại sản phẩm cần sửa!"));
+
+        existing.setCategoryName(category.getCategoryName());
+        existing.setCategoryCode(category.getCategoryCode());
+        categoryRepository.save(existing);
+    }
+    
+    public void delete(Integer id) { 
+    	categoryRepository.deleteById(id); 
+    }
+}

@@ -1,0 +1,11 @@
+package khanh.ntu.Repositories;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import khanh.ntu.models.Brand;
+
+public interface BrandRepository extends JpaRepository<Brand, Integer>{
+
+	boolean existsByBrandCode(String brandCode);
+    boolean existsByBrandCodeAndBrandIdNot(String brandCode, Integer integer);
+}

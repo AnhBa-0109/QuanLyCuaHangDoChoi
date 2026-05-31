@@ -1,0 +1,62 @@
+package khanh.ntu.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import khanh.ntu.models.Brand;
+import khanh.ntu.models.Category;
+import khanh.ntu.services.BrandService;
+import khanh.ntu.services.CategoryService;
+
+@Controller
+public class CategoryBrandController {
+	
+	@Autowired
+	private CategoryService categoryService;
+	
+	@Autowired
+	private BrandService brandService;
+	
+	@GetMapping("/admin/category")
+	public String showCategoryPage(ModelMap m) {
+		m.addAttribute("categories", categoryService.getAll());
+		m.addAttribute("brands", brandService.getAll());
+		return "categoryPage";
+	}
+	
+	//save cho brand
+	@PostMapping("/admin/brand/save")
+	public String saveBrand(@ModelAttribute("brand") Brand b, RedirectAttributes redirectAttributes) {
+		try {
+			if (b.getBrandId() != null) {
+	            brandService.edit(b);
+	        } else {
+	            brandService.save(b);
+	        }
+		} catch (RuntimeException e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+		}
+		return "redirect:/admin/category";
+	}
+	
+	//save cho category
+	@PostMapping("/admin/category/save")
+	public String saveCategory(@ModelAttribute("category") Category c, RedirectAttributes redirectAttributes) {
+		try {
+			if (c.getCategoryId() != null) {
+	            categoryService.edit(c);
+	        } else {
+	            categoryService.save(c);
+	        }
+		} catch (RuntimeException e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+		}
+		return "redirect:/admin/category";
+	}
+	
+}

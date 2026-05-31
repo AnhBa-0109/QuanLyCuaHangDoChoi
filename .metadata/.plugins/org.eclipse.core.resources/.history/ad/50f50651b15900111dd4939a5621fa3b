@@ -1,0 +1,112 @@
+package khanh.ntu.controllers;
+
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import khanh.ntu.models.Product;
+import khanh.ntu.services.BrandService;
+import khanh.ntu.services.CategoryService;
+import khanh.ntu.services.ProductService;
+
+@Controller
+public class ProductController {
+	@Autowired 
+	private ProductService productService;
+	
+    @Autowired 
+    private CategoryService categoryService;
+    
+    @Autowired 
+    private BrandService brandService;
+    
+    
+    @GetMapping("/admin/products")
+    public String showProductPage(@RequestParam(value = "brandId", required = false) Integer brandId, 
+						            @RequestParam(value = "categoryId", required = false) Integer categoryId,
+						            @RequestParam(value = "status", required = false) String status,
+						            @RequestParam(value = "search", required = false) String keyword,
+						            @RequestParam(value = "page", defaultValue = "1") int page,
+						            ModelMap m) {
+    	int pageSize = 6;
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("productId").descending());
+        
+        Page<Product> productPage = productService.getFilteredAndPaginatedProducts(brandId, categoryId, keyword, status, pageable);
+        
+        m.addAttribute("products", productPage.getContent());
+        m.addAttribute("currentPage", page);
+        m.addAttribute("totalPages", productPage.getTotalPages());
+        m.addAttribute("keyword", keyword);
+        m.addAttribute("status", status);
+        
+        m.addAttribute("brands", brandService.getAll());
+        m.addAttribute("categories", categoryService.getAll());
+        m.addAttribute("currentBrand", brandId);
+        m.addAttribute("currentCategory", categoryId);
+        return "product_template/productPage"; 
+    }
+    
+    @GetMapping("/admin/create")
+    public String createForm(ModelMap m) {
+        m.addAttribute("product", new Product());
+        m.addAttribute("categories", categoryService.getAll());
+        m.addAttribute("brands", brandService.getAll());
+        return "product_template/createProduct";
+    }
+    
+    @PostMapping("/admin/save")
+    public String save(@ModelAttribute("product") Product product, @RequestParam(value = "ProductImage", required = false) MultipartFile productImage) {
+    	try {
+            if (productImage != null && !productImage.isEmpty()) {
+                String fileName = productImage.getOriginalFilename();
+                String uploadDir = "D:/Learn/Web Exercises/QuanLyCuaHangDoChoi/QuanLyCuaHangDoChoi/Images/Products";
+                
+                Path uploadPath = Paths.get(uploadDir);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(productImage.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                
+                product.setImageUrl("/Images/Products/" + fileName);
+            }
+            
+            product.setIsActive(true); 
+
+            productService.save(product);
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "redirect:/admin/products";
+    }
+    
+    @GetMapping("/admin/edit/{id}")
+    public String editForm(@PathVariable("id") Integer id, ModelMap model) {
+        model.addAttribute("product", productService.getById(id));
+        model.addAttribute("categories", categoryService.getAll());
+        model.addAttribute("brands", brandService.getAll());
+        return "editProduct";
+    }
+    
+    @GetMapping("/admin/delete/{id}")
+    public String delete(@PathVariable("id") Integer id) {
+        productService.delete(id);
+        return "redirect:/admin/products";
+    }
+}
