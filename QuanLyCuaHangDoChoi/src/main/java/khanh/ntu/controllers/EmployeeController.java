@@ -67,13 +67,24 @@ public class EmployeeController {
 	                              @RequestParam("avatarFile") MultipartFile avatarFile,
 	                              ModelMap model,
 	                              RedirectAttributes redirectAttributes) {
+	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String username = auth.getName();
+	    User currentUser = userService.getByUsername(username);
+	    model.addAttribute("currentUser", currentUser);
+
 	    try {
 	        userService.save(user.getUsername(), user.getEmail(), user, avatarFile);
 	        redirectAttributes.addFlashAttribute("success", "Thêm nhân viên thành công!");
 	        return "redirect:/admin/employee";
 	    } catch (Exception e) {
 	        model.addAttribute("userCreate", user);
-	        model.addAttribute("errorUsername", e.getMessage());
+	        String msg = e.getMessage();
+	        if (msg.contains("đăng nhập"))
+	            model.addAttribute("errorUsername", msg);
+	        else if (msg.contains("Email"))
+	            model.addAttribute("errorEmail", msg);
+	        else
+	            model.addAttribute("errorGeneral", msg);
 	        return "employee_template/createEmployee";
 	    }
 	}

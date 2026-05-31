@@ -31,7 +31,7 @@ public class DashboardController {
     @Autowired
     private UserService userService;
 
-    @GetMapping({"/admin/dashboard"})
+    @GetMapping({"/admin","/admin/dashboard"})
     public String showDashboard(
     		@RequestParam(value = "type", defaultValue = "week") String type,
             @RequestParam(value = "startDate", required = false) String startDateStr,
