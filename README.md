@@ -145,3 +145,6 @@ QuanLyCuaHangDoChoi/
 ## 📄 Giấy Phép
 
 Dự án này được phát triển cho mục đích học tập. Mọi đóng góp và phản hồi đều được hoan nghênh!
+
+## Video giới thiệu đề tài
+[![Xem demo](https://img.youtube.com/vi/xyWXlmjNumo/0.jpg)](https://www.youtube.com/watch?v=xyWXlmjNumo)
