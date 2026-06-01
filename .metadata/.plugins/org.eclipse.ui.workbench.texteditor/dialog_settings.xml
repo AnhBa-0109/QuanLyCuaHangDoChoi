@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="java.lang.Class">
-		<item key="replaceBarOpen" value="false"/>
+		<item key="replaceBarOpen" value="true"/>
 		<list key="findhistory">
+			<item value="Đơn hàng"/>
+			<item value="đơn hàng"/>
+			<item value="/login"/>
+			<item value="roleU"/>
 			<item value="min"/>
 			<item value="existsByUsername"/>
 			<item value="password"/>
@@ -14,10 +18,9 @@
 			<item value="stock"/>
 			<item value="user"/>
 			<item value="order"/>
-			<item value="products"/>
-			<item value="/OrderPage_6513146"/>
-			<item value="/OrderPage_65131467"/>
-			<item value="orderModel"/>
+		</list>
+		<list key="replacehistory">
+			<item value="hóa đơn"/>
 		</list>
 	</section>
 </section>

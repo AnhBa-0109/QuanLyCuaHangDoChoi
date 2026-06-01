@@ -42,6 +42,12 @@
                 },
             },
         }
+        
+        $(document).ready(function() {
+            $('.use-select2').select2({
+                width: '100%'
+            });
+        });
     </script>
     <style>
         body {
@@ -91,7 +97,7 @@
 
         /* Giới hạn độ cao của khung xổ xuống */
         .select2-results__options {
-            max-height: 200px !important; /* Chiều cao tối đa bạn muốn */
+            max-height: 160px !important; /* Chiều cao tối đa bạn muốn */
             overflow-y: auto !important;
         }
 

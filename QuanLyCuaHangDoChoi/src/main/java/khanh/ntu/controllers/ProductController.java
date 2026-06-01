@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import khanh.ntu.models.Product;
 import khanh.ntu.models.User;
@@ -85,30 +86,27 @@ public class ProductController {
     }
     
     @PostMapping("/admin/save")
-    public String save(@ModelAttribute("product") Product product, @RequestParam(value = "ProductImage", required = false) MultipartFile productImage) {
-    	try {
-            if (productImage != null && !productImage.isEmpty()) {
-                String fileName = productImage.getOriginalFilename();
-                String uploadDir = "D:/Learn/Web Exercises/QuanLyCuaHangDoChoi/QuanLyCuaHangDoChoi/Images/Products";
-                
-                Path uploadPath = Paths.get(uploadDir);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-                
-                Path filePath = uploadPath.resolve(fileName);
-                Files.copy(productImage.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                
-                product.setImageUrl("/Images/Products/" + fileName);
-            }
-            
-            product.setIsActive(true); 
+    public String save(@ModelAttribute("product") Product product,
+                       @RequestParam(value = "ProductImage", required = false) MultipartFile productImage,
+                       ModelMap model,
+                       RedirectAttributes redirectAttributes){
 
-            productService.save(product);
-            
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (product.getBrand() == null || product.getBrand().getBrandId() == null) {
+
+            return "product_template/createProduct";
         }
+        if (product.getCategory() == null || product.getCategory().getCategoryId() == null) {
+
+            return "product_template/createProduct";
+        }
+
+        try {
+            productService.save(product, productImage);
+            redirectAttributes.addFlashAttribute("successMessage", "Lưu sản phẩm thành công!");
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi upload ảnh!");
+        }
+
         return "redirect:/admin/products";
     }
     

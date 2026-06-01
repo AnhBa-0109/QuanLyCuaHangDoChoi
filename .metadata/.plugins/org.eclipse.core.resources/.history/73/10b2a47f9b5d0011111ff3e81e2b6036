@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head_info}"></head>
+
+<body class="bg-background-light dark:bg-background-dark h-screen flex overflow-hidden">
+
+	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+	
+	<div class="flex-1 flex flex-col min-w-0">
+	
+		<header th:replace="~{fragments/header :: header}"></header>
+		
+		<main class="flex-1 overflow-y-auto p-4 md:p-8">
+			<div class="p-6 md:p-8 flex flex-col gap-4 max-w-[1600px] mx-auto w-full">
+                
+                <form th:action="@{/admin/order/create}" th:object="${orderModel}" method="post">
+                    
+                    <div th:if="${#fields.hasErrors('global')}" class="text-red-500 text-sm mb-4">
+                        <p th:each="err : ${#fields.errors('global')}" th:text="${err}"></p>
+                    </div>
+
+                    <div class="flex flex-wrap justify-between gap-3 px-4 mb-6">
+                        <div class="flex min-w-72 flex-col gap-2">
+                            <h1 class="text-2xl font-black leading-tight tracking-[-0.033em] text-text-primary dark:text-white">Tạo Đơn Hàng Mới</h1>
+                            <p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Nhập thông tin chi tiết để tạo đơn hàng mới cho khách hàng.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 flex flex-col gap-6">
+                            
+                            <div class="bg-white dark:bg-[#1C252E] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6">
+                                <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-[#111418] dark:text-white">
+                                    <span class="material-symbols-outlined text-primary">person</span>
+                                    Thông tin đơn hàng
+                                </h3>
+                                <div class="flex flex-col sm:flex-row gap-4">
+                                    <label class="flex flex-col flex-1">
+                                        <p class="text-sm font-medium pb-2 text-gray-700 dark:text-gray-300">Nhân viên lập đơn</p>
+                                        <div class="relative">
+                                            <input type="text" th:value="${fullName}" readonly class="form-input w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 h-12 px-4 text-base cursor-default focus:outline-none text-[#111418] dark:text-white" />
+                                            <input type="hidden" th:field="*{userId}" />
+                                        </div>
+                                    </label>
+                                    <label class="flex flex-col flex-1">
+                                        <p class="text-sm font-medium pb-2 text-gray-700 dark:text-gray-300">Tên khách hàng</p>
+                                        <div class="relative">
+                                            <input type="text" th:field="*{customerName}" required placeholder="Nhập tên khách hàng" class="form-input w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#111921] h-12 px-4 text-base focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-gray-400 text-[#111418] dark:text-white" />
+                                            <span th:if="${#fields.hasErrors('customerName')}" th:errors="*{customerName}" class="text-red-500 text-xs font-medium block mt-1"></span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-[#1C252E] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 flex flex-col flex-1">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-bold flex items-center gap-2 text-[#111418] dark:text-white">
+                                        <span class="material-symbols-outlined text-primary">inventory_2</span>
+                                        Danh sách sản phẩm
+                                    </h3>
+                                </div>
+                                <div class="max-h-[550px] overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg custom-scrollbar">
+                                    <table class="w-full text-left border-collapse table-fixed">
+                                        <thead class="sticky top-0 z-10">
+                                            <tr class="text-xs font-semibold text-gray-500 uppercase border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                                                <th class="px-4 py-3 w-12 text-center">Chọn</th>
+                                                <th class="w-[420px] px-4 py-3">Sản phẩm</th>
+                                                <th class="px-4 py-3 text-right">Đơn giá</th>
+                                                <th class="px-4 py-3 text-center w-32">Số lượng</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                                            
+                                            <tr th:each="p, stat : *{products}" class="group hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
+                                                <td class="px-4 py-4 align-middle text-center">
+                                                    <input type="checkbox" th:field="*{products[__${stat.index}__].selected}" 
+                                                           th:disabled="${p.stock == 0}"
+                                                           th:data-index="${stat.index}"
+                                                           class="product-check rounded border-gray-300 text-primary focus:ring-primary w-4 h-4 disabled:opacity-50 disabled:cursor-not-allowed" />
+                                                </td>
+                                                <td class="px-4 py-4 align-middle">
+                                                    <div class="flex items-center gap-3">
+                                                        <img th:src="${p.imageUrl}" class="w-12 h-12 rounded bg-gray-200 shrink-0 object-cover" alt="Product Image" />
+                                                        <div>
+                                                            <p class="font-medium text-[#111418] dark:text-white line-clamp-1" th:text="${p.productName}"></p>
+                                                            <div class="flex items-center gap-2 mt-0.5">
+                                                                <span class="text-xs text-gray-500" th:text="'Mã SP: ' + ${p.productId}"></span>
+                                                                
+                                                                <span th:if="${p.stock > 10}" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400" th:text="'Còn ' + ${p.stock}"></span>
+                                                                <span th:if="${p.stock > 0 and p.stock <= 10}" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400" th:text="'Còn ' + ${p.stock}"></span>
+                                                                <span th:if="${p.stock == 0}" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400">Hết hàng</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-4 align-middle text-right font-medium text-[#111418] dark:text-white" th:text="${#numbers.formatInteger(p.price, 0, 'COMMA')} + ' đ'"></td>
+                                                <td class="px-4 py-4 align-middle">
+                                                    <div class="flex items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden h-9 w-28 mx-auto bg-white dark:bg-[#111921]">
+                                                        
+                                                        <input th:if="${p.stock > 0}" type="number" 
+                                                               th:field="*{products[__${stat.index}__].quantity}" 
+                                                               th:id="'qty_' + ${stat.index}"
+                                                               min="0" th:max="${p.stock}" th:data-index="${stat.index}"
+                                                               class="product-qty w-full h-full text-center border-none p-0 text-sm focus:ring-0 bg-transparent text-[#111418] dark:text-white" />
+                                                               
+                                                        <input th:if="${p.stock == 0}" type="text" value="0" readonly class="w-full h-full text-center border-none p-0 text-sm bg-gray-100 dark:bg-gray-700 cursor-not-allowed text-gray-500" />
+                                                        <input th:if="${p.stock == 0}" type="hidden" th:field="*{products[__${stat.index}__].quantity}" />
+                                                    </div>
+                                                </td>
+                                                
+                                                <input type="hidden" th:field="*{products[__${stat.index}__].productName}" th:id="'name_' + ${stat.index}" />
+                                                <input type="hidden" th:field="*{products[__${stat.index}__].productId}" />
+                                                <input type="hidden" th:field="*{products[__${stat.index}__].price}" th:id="'price_' + ${stat.index}" />
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-[#1C252E] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6">
+                                <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-[#111418] dark:text-white">
+                                    <span class="material-symbols-outlined text-primary">payments</span>
+                                    Phương thức thanh toán
+                                </h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <label class="cursor-pointer group relative">
+                                        <input type="radio" th:field="*{paymentMethod}" value="Cash" checked class="peer sr-only" />
+                                        <div class="p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex flex-col items-center gap-2">
+                                            <span class="material-symbols-outlined text-3xl text-gray-500 peer-checked:text-primary">attach_money</span>
+                                            <span class="font-medium text-sm text-gray-700 dark:text-gray-200 peer-checked:text-primary">Tiền mặt</span>
+                                        </div>
+                                        <div class="absolute top-2 right-2 text-primary opacity-0 peer-checked:opacity-100">
+                                            <span class="material-symbols-outlined text-lg">check_circle</span>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer group relative">
+                                        <input type="radio" th:field="*{paymentMethod}" value="BankTransfer" class="peer sr-only" />
+                                        <div class="p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex flex-col items-center gap-2">
+                                            <span class="material-symbols-outlined text-3xl text-gray-500 peer-checked:text-primary">account_balance</span>
+                                            <span class="font-medium text-sm text-gray-700 dark:text-gray-200 peer-checked:text-primary">Chuyển khoản</span>
+                                        </div>
+                                        <div class="absolute top-2 right-2 text-primary opacity-0 peer-checked:opacity-100">
+                                            <span class="material-symbols-outlined text-lg">check_circle</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-1">
+                            <div class="lg:sticky lg:top-6 flex flex-col gap-6">
+                                <div class="bg-white dark:bg-[#1C252E] rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 p-6">
+                                    <h3 class="text-xl font-bold mb-6 text-[#111418] dark:text-white">Tổng quan đơn hàng</h3>
+                                    
+                                    <div id="order-summary" class="flex flex-col gap-4 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                        </div>
+                                    
+                                    <div class="border-t border-dashed border-gray-300 dark:border-gray-700 my-4"></div>
+                                    
+                                    <div class="space-y-3 mb-6">
+                                        <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                            <span id="subtotal">Tạm tính (0 sản phẩm)</span>
+                                            <span id="grand-total-small">0 ₫</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="border-t border-gray-200 dark:border-gray-700 my-4"></div>
+                                    
+                                    <div class="flex justify-between items-center mb-8">
+                                        <span class="text-base font-bold text-[#111418] dark:text-white">Tổng cộng</span>
+                                        <span id="grandTotal" class="text-2xl font-black text-primary">0 ₫</span>
+                                    </div>
+                                    
+                                    <div class="flex flex-col gap-3">
+                                        <button type="submit" class="flex items-center justify-center gap-2 w-full h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg transition-all shadow-md shadow-blue-500/20 active:scale-[0.98]">
+                                            <span class="material-symbols-outlined">shopping_cart_checkout</span>
+                                            Tạo đơn hàng
+                                        </button>
+                                        <a th:href="@{/admin/order}" class="flex items-center justify-center gap-2 w-full h-12 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium rounded-lg transition-all border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+                                            <span class="material-symbols-outlined">close</span>
+                                            Hủy bỏ
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/30">
+                                    <div class="flex gap-3">
+                                        <span class="material-symbols-outlined text-primary">info</span>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-1">Lưu ý</h4>
+                                            <p class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">Vui lòng kiểm tra kỹ số lượng sản phẩm trước khi tạo đơn.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+		</main>
+	</div>
+	<script>
+        function updateSummaryAndTotal() {
+            const summary = document.getElementById("order-summary");
+            summary.innerHTML = "";
+
+            let total = 0;
+            let count = 0;
+
+            document.querySelectorAll(".product-check").forEach(cb => {
+                if (!cb.checked) return;
+
+                const i = cb.getAttribute('data-index');
+
+                const nameInput = document.getElementById(`name_${i}`);
+                const priceInput = document.getElementById(`price_${i}`);
+                const qtyInput = document.getElementById(`qty_${i}`);
+
+                if(nameInput && priceInput && qtyInput) {
+                    const name = nameInput.value;
+                    const price = parseInt(priceInput.value) || 0;
+                    const qty = parseInt(qtyInput.value) || 0;
+
+                    const itemTotal = price * qty;
+                    total += itemTotal;
+                    count++;
+
+                    summary.innerHTML += `
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1 pr-2">
+                                <p class="text-sm font-medium text-[#111418] dark:text-white">${name}</p>
+                                <p class="text-xs text-gray-500">x${qty}</p>
+                            </div>
+                            <p class="text-sm font-medium text-[#111418] dark:text-white whitespace-nowrap">${itemTotal.toLocaleString('vi-VN')} ₫</p>
+                        </div>`;
+                }
+            });
+
+            document.getElementById("subtotal").innerText = `Tạm tính (${count} sản phẩm)`;
+            document.getElementById("grand-total-small").innerText = total.toLocaleString('vi-VN') + " ₫";
+            document.getElementById("grandTotal").innerText = total.toLocaleString('vi-VN') + " ₫";
+        }
+
+        document.addEventListener("change", function(e) {
+            if (e.target.classList.contains('product-check')) {
+                const i = e.target.getAttribute('data-index');
+                const qtyInput = document.getElementById('qty_' + i);
+                if (qtyInput) {
+                    if (e.target.checked) {
+                        if (parseInt(qtyInput.value) < 1) qtyInput.value = 1;
+                    } else {
+                        qtyInput.value = 0;
+                    }
+                }
+                updateSummaryAndTotal();
+            } else if (e.target.classList.contains('product-qty')) {
+                const i = e.target.getAttribute('data-index');
+                const cb = document.querySelector('.product-check[data-index="' + i + '"]');
+                if (cb) cb.checked = parseInt(e.target.value) > 0;
+                updateSummaryAndTotal();
+            }
+        });
+        
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const checkedCount = document.querySelectorAll('.product-check:checked').length;
+            const paymentSelected = document.querySelector('input[name="paymentMethod"]:checked');
+            
+            if (checkedCount === 0) {
+                e.preventDefault();
+                alert('Vui long chon it nhat mot san pham.');
+                return;
+            }
+            
+            let valid = true;
+            document.querySelectorAll('.product-check').forEach(cb => {
+                if (!cb.checked) return;
+                const i = cb.getAttribute('data-index');
+                const qtyInput = document.getElementById('qty_' + i);
+                if (!qtyInput || parseInt(qtyInput.value) < 1) valid = false;
+            });
+            if (!valid) {
+                e.preventDefault();
+                alert('San pham da chon phai co so luong it nhat la 1.');
+            }
+            
+            if (!paymentSelected) {
+                e.preventDefault();
+                alert('Vui lòng chọn phương thức thanh toán!');
+            }
+        });
+        
+        window.addEventListener('DOMContentLoaded', updateSummaryAndTotal);
+    </script>
+</body>
+</html>

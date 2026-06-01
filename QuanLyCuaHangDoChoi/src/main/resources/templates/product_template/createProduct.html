@@ -18,7 +18,7 @@
                     </div>
                 </div>
 
-                <form th:action="@{/admin/save}" th:object="${product}" method="post" enctype="multipart/form-data" novalidate="novalidate">
+                <form th:action="@{/admin/save}" th:object="${product}" method="post" enctype="multipart/form-data">
                     
                     <div th:if="${#fields.hasErrors('global')}" th:errors="*{global}" class="text-red-500 text-sm mb-4"></div>
                     
@@ -30,7 +30,7 @@
                                 <div class="grid grid-cols-1 gap-6">
                                     <label class="flex flex-col gap-2">
                                         <span class="text-sm font-semibold text-text-main-light dark:text-text-main-dark">Tên sản phẩm <span class="text-red-500">*</span></span>
-                                        <input type="text" th:field="*{productName}" placeholder="Ví dụ: MG Gundam Barbatos 1/100" 
+                                        <input type="text" th:field="*{productName}" placeholder="Ví dụ: MG Gundam Barbatos 1/100"  required
                                                class="w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark placeholder-text-sec-light focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" />
                                         <span th:if="${#fields.hasErrors('productName')}" th:errors="*{productName}" class="text-red-500 text-xs font-medium"></span>
                                     </label>
@@ -39,35 +39,29 @@
                                     
                                     <div class="flex flex-col gap-2">
                                         <span class="text-sm font-semibold text-text-main-light dark:text-text-main-dark">
-                                            Danh mục Brand
+                                            Danh mục Brand <span class="text-red-500">*</span>
                                         </span>
                                         <div class="flex items-center gap-2">
                                             <div class="flex-1 relative">
-                                                <select id="BrandID" th:field="*{brand.brandId}" class="select-arrow w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none cursor-pointer use-select2" size="5">
+                                                <select id="BrandID" th:field="*{brand.brandId}" class=" max-h-40 select-arrow w-full px-4 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none cursor-pointer use-select2">
                                                     <option value="">-- Chọn Brand --</option>
                                                     <option th:each="b : ${brands}" th:value="${b.brandId}" th:text="${b.brandName}"></option>
                                                 </select>
                                             </div>
-                                            <button type="button" onclick="openModal('brand')" class="w-12 h-12 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-sec-light hover:border-primary hover:text-primary transition-colors focus:ring-2 focus:ring-primary" title="Thêm Brand mới">
-                                                <span class="material-symbols-outlined">add</span>
-                                            </button>
                                         </div>
                                     </div>
 
                                     <div class="flex flex-col gap-2">
                                         <span class="text-sm font-semibold text-text-main-light dark:text-text-main-dark">
-                                            Danh mục Loại
+                                            Danh mục Loại <span class="text-red-500">*</span>
                                         </span>
                                         <div class="flex items-center gap-2">
                                             <div class="flex-1 relative">
-                                                <select id="CategoryID" th:field="*{category.categoryId}" class="select-arrow w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none cursor-pointer use-select2" size="5">
+                                                <select id="CategoryID" th:field="*{category.categoryId}" class="select-arrow w-full h-12 px-4 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none cursor-pointer use-select2">
                                                     <option value="">-- Chọn Loại --</option>
                                                     <option th:each="c : ${categories}" th:value="${c.categoryId}" th:text="${c.categoryName}"></option>
                                                 </select>
                                             </div>
-                                            <button type="button" onclick="openModal('category')" class="w-12 h-12 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-sec-light hover:border-primary hover:text-primary transition-colors focus:ring-2 focus:ring-primary" title="Thêm Category mới">
-                                                <span class="material-symbols-outlined">add</span>
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -77,10 +71,10 @@
                                 <h3 class="text-lg font-bold text-text-main-light dark:text-text-main-dark border-b border-border-light dark:border-border-dark pb-2">Giá &amp; Kho hàng</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <label class="flex flex-col gap-2">
-                                        <span class="text-sm font-semibold text-text-main-light dark:text-text-main-dark">Giá nhập (VNĐ)</span>
+                                        <span class="text-sm font-semibold text-text-main-light dark:text-text-main-dark">Giá nhập (VNĐ) <span class="text-red-500">*</span></span>
                                         <div class="relative">
                                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-sec-light dark:text-text-sec-dark material-symbols-outlined text-[20px]">payments</span>
-                                            <input type="number" th:field="*{importPrice}" 
+                                            <input type="number" th:field="*{importPrice}"  required
                                                    class="w-full h-12 pl-12 pr-4 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark placeholder-text-sec-light focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" />
                                         </div>
                                         <span th:if="${#fields.hasErrors('importPrice')}" th:errors="*{importPrice}" class="text-red-500 text-xs font-medium"></span>
@@ -90,17 +84,17 @@
                                         <span class="text-sm font-semibold text-text-main-light dark:text-text-main-dark">Giá bán (VNĐ) <span class="text-red-500">*</span></span>
                                         <div class="relative">
                                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-sec-light dark:text-text-sec-dark material-symbols-outlined text-[20px]">sell</span>
-                                            <input type="number" th:field="*{sellPrice}" 
+                                            <input type="number" th:field="*{sellPrice}" required
                                                    class="w-full h-12 pl-12 pr-4 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark placeholder-text-sec-light focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" />
                                         </div>
                                         <span th:if="${#fields.hasErrors('sellPrice')}" th:errors="*{sellPrice}" class="text-red-500 text-xs font-medium"></span>
                                     </label>
 
                                     <label class="flex flex-col gap-2">
-                                        <span class="text-sm font-semibold text-text-main-light dark:text-text-main-dark">Số lượng tồn kho</span>
+                                        <span class="text-sm font-semibold text-text-main-light dark:text-text-main-dark">Số lượng tồn kho <span class="text-red-500">*</span></span>
                                         <div class="relative">
                                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-sec-light dark:text-text-sec-dark material-symbols-outlined text-[20px]">inventory</span>
-                                            <input type="number" th:field="*{quantity}" 
+                                            <input type="number" th:field="*{quantity}" required
                                                    class="w-full h-12 pl-12 pr-4 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark placeholder-text-sec-light focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" />
                                         </div>
                                         <span th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}" class="text-red-500 text-xs font-medium"></span>
@@ -144,20 +138,6 @@
                 </form>
             </div>
 
-            <div id="addModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
-                <div class="bg-white dark:bg-surface-dark rounded-xl p-6 w-96 flex flex-col gap-3">
-                    <h3 id="modalTitle" class="text-lg font-bold mb-4"></h3>
-
-                    <input id="modalNameInput" class="w-full h-12 px-4 rounded-lg border" placeholder="" />
-                    <input id="modalCodeInput" class="w-full h-12 px-4 rounded-lg border" placeholder="" />
-                    
-                    <div class="flex justify-end gap-2 mt-4">
-                        <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-lg">Hủy</button>
-                        <button type="button" onclick="saveItem()" class="px-4 py-2 bg-primary text-white rounded-lg">Lưu</button>
-                    </div>
-                </div>
-            </div>
-
             <script th:inline="javascript">
                 let currentType = "";
                 const input = document.getElementById('productImageInput');
@@ -173,94 +153,21 @@
                         reader.readAsDataURL(this.files[0]);
                     }
                 });
+                
+                document.querySelector('form').addEventListener('submit', function(e) {
+                    const brandId = document.getElementById('BrandID').value;
+                    const categoryId = document.getElementById('CategoryID').value;
 
-                function openModal(type) {
-                    currentType = type;
-
-                    document.getElementById('modalTitle').innerText =
-                        type === 'brand' ? 'Thêm Brand mới' : 'Thêm Category mới';
-
-                    document.getElementById('modalNameInput').placeholder =
-                        type === 'brand' ? 'Tên Brand' : 'Tên Category';
-
-                    document.getElementById('modalCodeInput').placeholder =
-                        type === 'brand' ? 'Brand Code' : 'Category Code';
-
-                    document.getElementById('modalNameInput').value = '';
-                    document.getElementById('modalCodeInput').value = '';
-
-                    document.getElementById('addModal').classList.remove('hidden');
-                    document.getElementById('addModal').classList.add('flex');
-                }
-
-                function closeModal() {
-                    document.getElementById('addModal').classList.add('hidden');
-                }
-
-                function saveItem() {
-                    const name = document.getElementById('modalNameInput').value.trim();
-                    const code = document.getElementById('modalCodeInput').value.trim();
-
-                    if (!name) {
-                        alert('Không được để trống');
+                    if (!brandId) {
+                        e.preventDefault();
+                        alert('Vui lòng chọn Brand!');
                         return;
                     }
-                    if (!code) {
-                        alert('Không được để trống');
+                    if (!categoryId) {
+                        e.preventDefault();
+                        alert('Vui lòng chọn Loại!');
                         return;
                     }
-
-                    let url = '';
-                    let selectId = '';
-
-                    if (currentType === 'brand') {
-                        // Lưu ý: Cần tạo 1 API @PostMapping("/admin/createBrandAjax") trong Controller của Spring Boot
-                        url = '/admin/createBrandAjax'; 
-                        selectId = 'BrandID';
-                    }
-                    else {
-                        // Lưu ý: Cần tạo 1 API @PostMapping("/admin/createCategoryAjax") trong Controller của Spring Boot
-                        url = '/admin/createCategoryAjax';
-                        selectId = 'CategoryID';
-                    }
-
-                    fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            BrandName: currentType === 'brand' ? name : null,
-                            BrandCode: currentType === 'brand' ? code : null,
-                            CategoriesName: currentType === 'category' ? name : null,
-                            CategoryCode: currentType === 'category' ? code : null
-                        })
-                    })
-                        .then(res => res.json())
-                        .then(data => {
-                            console.log("PARSED DATA:", data);
-
-                            if (data.error) {
-                                alert(data.error);
-                                return;
-                            }
-
-                            const select = document.getElementById(selectId);
-                            const option = new Option(data.name, data.id, true, true);
-                            select.add(option);
-
-                            closeModal();
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            alert("Có lỗi JS xảy ra: " + err.message);
-                        });
-                }
-
-                $(document).ready(function () {
-                    $('.use-select2').select2({
-                        width: '100%',
-                        placeholder: "-- Chọn --",
-                        allowClear: true
-                    });
                 });
             </script>
             </main>

@@ -10,8 +10,8 @@
 		<main class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark relative">
 			<div class="flex-1 p-8 mx-auto w-full gap-6">
 			    <div class="flex flex-col mb-6">
-			        <h1 class="text-2xl font-black text-text-primary dark:text-white tracking-tight">Danh sách Đơn hàng</h1>
-			        <p class="text-text-secondary text-sm mt-1">Quản lý Đơn hàng, thời gian tạo đơn và tổng tiền của từng đơn.</p>
+			        <h1 class="text-2xl font-black text-text-primary dark:text-white tracking-tight">Danh sách hóa đơn</h1>
+			        <p class="text-text-secondary text-sm mt-1">Quản lý hóa đơn, thời gian tạo đơn và tổng tiền của từng đơn.</p>
 			    </div>
 			
 			    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 mb-6 bg-white dark:bg-[#1e2936] p-5 rounded-xl border border-[#e5e7eb] dark:border-[#2a3441] shadow-sm">
@@ -46,7 +46,7 @@
 			            <a th:href="@{/admin/order/create}">
 			                <button class="h-[42px] px-6 bg-primary hover:bg-blue-600 text-white shadow-lg shadow-blue-500/30 rounded-lg text-sm font-bold transition-all transform active:scale-95 flex items-center justify-center gap-2">
 			                    <span class="material-symbols-outlined text-[20px]">add</span>
-			                    Tạo đơn hàng mới
+			                    Tạo hóa đơn mới
 			                </button>
 			            </a>
 			        </div>
@@ -57,7 +57,7 @@
 			            <table class="w-full text-left border-collapse">
 			                <thead>
 			                    <tr class="bg-[#f9fafb] dark:bg-[#111921] border-b border-[#e5e7eb] dark:border-[#2a3441]">
-			                        <th class="py-4 px-6 text-xs font-semibold uppercase text-[#637588] dark:text-[#9ca3af] tracking-wider w-[130px] text-center">Mã đơn hàng</th>
+			                        <th class="py-4 px-6 text-xs font-semibold uppercase text-[#637588] dark:text-[#9ca3af] tracking-wider w-[130px] text-center">Mã hóa đơn</th>
 			                        <th class="py-4 px-6 text-xs font-semibold uppercase text-[#637588] dark:text-[#9ca3af] tracking-wider">Ngày tạo</th>
 			                        <th class="py-4 px-6 text-xs font-semibold uppercase text-[#637588] dark:text-[#9ca3af] tracking-wider">Khách hàng</th>
 			                        <th class="py-4 px-6 text-xs font-semibold uppercase text-[#637588] dark:text-[#9ca3af] tracking-wider">Nhân viên</th>
@@ -87,7 +87,7 @@
 			                                    <span class="material-symbols-outlined text-[20px]">visibility</span>
 			                                </button>                                  
 			                            </a>
-			                            <button th:if="${o.status}" th:onclick="|openDeleteModal('${o.orderId}')|" class="p-1.5 text-text-secondary hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors" title="Hủy">
+			                            <button th:if="${o.status == true and currentUser.roleU == 'Admin'}" th:onclick="|openDeleteModal('${o.orderId}')|" class="p-1.5 text-text-secondary hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors" title="Hủy">
 			                                <span class="material-symbols-outlined !text-lg">delete</span>
 			                            </button>
 			                        </td>
@@ -158,7 +158,7 @@
 	            Xác nhận xóa
 	        </h3>
 	        <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">
-	            Bạn có chắc muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.
+	            Bạn có chắc muốn hủy hóa đơn này không? Hành động này không thể hoàn tác.
 	        </p>
 	
 	        <div class="flex justify-end gap-3">

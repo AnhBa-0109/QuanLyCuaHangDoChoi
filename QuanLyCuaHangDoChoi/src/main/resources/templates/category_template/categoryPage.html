@@ -66,6 +66,7 @@
 													<span class="material-symbols-outlined text-[20px]">edit</span>
 												</button>
 			                                    <button onclick="openDeleteModal(this.getAttribute('data-id'), 'brand')"
+			                                    		th:if="${currentUser.roleU == 'Admin'}"
 												        th:data-id="${b.brandId}"
 												        th:disabled="${brandProductCount != null && brandProductCount.getOrDefault(b.brandId, 0) > 0}"
 												        th:classappend="${brandProductCount != null && brandProductCount.getOrDefault(b.brandId, 0) > 0} ? 'opacity-30 cursor-not-allowed' : ''"
@@ -127,6 +128,7 @@
 												    <span class="material-symbols-outlined text-[20px]">edit</span>
 												</button>
 			                                    <button onclick="openDeleteModal(this.getAttribute('data-id'), 'category')"
+			                                    		th:if="${currentUser.roleU == 'Admin'}"
 			                                            th:data-id="${c.categoryId}"
 												        th:disabled="${categoryProductCount != null && categoryProductCount.getOrDefault(c.categoryId, 0) > 0}"
 												        th:classappend="${categoryProductCount != null && categoryProductCount.getOrDefault(c.categoryId, 0) > 0} ? 'opacity-30 cursor-not-allowed' : ''"

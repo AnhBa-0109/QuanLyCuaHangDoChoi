@@ -1,9 +1,0 @@
-package khanh.ntu.Repositories;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import khanh.ntu.models.Order;
-
-public interface OrderRepository extends JpaRepository<Order, Integer>{
-
-}

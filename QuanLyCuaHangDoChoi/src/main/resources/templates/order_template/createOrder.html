@@ -6,12 +6,12 @@
 
 	<aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 	
-	<div class="flex-1 flex flex-col min-w-0">
+	<div class="flex-1 flex flex-col">
 	
 		<header th:replace="~{fragments/header :: header}"></header>
 		
-		<main class="flex-1 overflow-y-auto p-4 md:p-8">
-			<div class="p-6 md:p-8 flex flex-col gap-4 max-w-[1600px] mx-auto w-full">
+		<main class="flex-1 overflow-y-auto p-4">
+			<div class="p-4 flex flex-col gap-4 ">
                 
                 <form th:action="@{/admin/order/create}" th:object="${orderModel}" method="post">
                     
@@ -19,10 +19,10 @@
                         <p th:each="err : ${#fields.errors('global')}" th:text="${err}"></p>
                     </div>
 
-                    <div class="flex flex-wrap justify-between gap-3 px-4 mb-6">
+                    <div class="flex flex-wrap justify-between gap-3 mb-6">
                         <div class="flex min-w-72 flex-col gap-2">
-                            <h1 class="text-2xl font-black leading-tight tracking-[-0.033em] text-text-primary dark:text-white">Tạo Đơn Hàng Mới</h1>
-                            <p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Nhập thông tin chi tiết để tạo đơn hàng mới cho khách hàng.</p>
+                            <h1 class="text-2xl font-black leading-tight tracking-[-0.033em] text-text-primary dark:text-white">Tạo hóa đơn Mới</h1>
+                            <p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Nhập thông tin chi tiết để tạo hóa đơn mới cho khách hàng.</p>
                         </div>
                     </div>
 
@@ -32,7 +32,7 @@
                             <div class="bg-white dark:bg-[#1C252E] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6">
                                 <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-[#111418] dark:text-white">
                                     <span class="material-symbols-outlined text-primary">person</span>
-                                    Thông tin đơn hàng
+                                    Thông tin hóa đơn
                                 </h3>
                                 <div class="flex flex-col sm:flex-row gap-4">
                                     <label class="flex flex-col flex-1">
@@ -45,7 +45,7 @@
                                     <label class="flex flex-col flex-1">
                                         <p class="text-sm font-medium pb-2 text-gray-700 dark:text-gray-300">Tên khách hàng</p>
                                         <div class="relative">
-                                            <input type="text" th:field="*{customerName}" placeholder="Nhập tên khách hàng" class="form-input w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#111921] h-12 px-4 text-base focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-gray-400 text-[#111418] dark:text-white" />
+                                            <input type="text" th:field="*{customerName}" required placeholder="Nhập tên khách hàng" class="form-input w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#111921] h-12 px-4 text-base focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-gray-400 text-[#111418] dark:text-white" />
                                             <span th:if="${#fields.hasErrors('customerName')}" th:errors="*{customerName}" class="text-red-500 text-xs font-medium block mt-1"></span>
                                         </div>
                                     </label>
@@ -150,7 +150,7 @@
                         <div class="lg:col-span-1">
                             <div class="lg:sticky lg:top-6 flex flex-col gap-6">
                                 <div class="bg-white dark:bg-[#1C252E] rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 p-6">
-                                    <h3 class="text-xl font-bold mb-6 text-[#111418] dark:text-white">Tổng quan đơn hàng</h3>
+                                    <h3 class="text-xl font-bold mb-6 text-[#111418] dark:text-white">Tổng quan hóa đơn</h3>
                                     
                                     <div id="order-summary" class="flex flex-col gap-4 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                                         </div>
@@ -174,7 +174,7 @@
                                     <div class="flex flex-col gap-3">
                                         <button type="submit" class="flex items-center justify-center gap-2 w-full h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg transition-all shadow-md shadow-blue-500/20 active:scale-[0.98]">
                                             <span class="material-symbols-outlined">shopping_cart_checkout</span>
-                                            Tạo đơn hàng
+                                            Tạo hóa đơn
                                         </button>
                                         <a th:href="@{/admin/order}" class="flex items-center justify-center gap-2 w-full h-12 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium rounded-lg transition-all border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
                                             <span class="material-symbols-outlined">close</span>
@@ -263,11 +263,14 @@
         
         document.querySelector('form').addEventListener('submit', function(e) {
             const checkedCount = document.querySelectorAll('.product-check:checked').length;
+            const paymentSelected = document.querySelector('input[name="paymentMethod"]:checked');
+            
             if (checkedCount === 0) {
                 e.preventDefault();
                 alert('Vui long chon it nhat mot san pham.');
                 return;
             }
+            
             let valid = true;
             document.querySelectorAll('.product-check').forEach(cb => {
                 if (!cb.checked) return;
@@ -278,6 +281,11 @@
             if (!valid) {
                 e.preventDefault();
                 alert('San pham da chon phai co so luong it nhat la 1.');
+            }
+            
+            if (!paymentSelected) {
+                e.preventDefault();
+                alert('Vui lòng chọn phương thức thanh toán!');
             }
         });
         

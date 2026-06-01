@@ -10,7 +10,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Service
@@ -33,20 +39,31 @@ public class ProductService {
     }
     
     @Transactional
-    public void save(Product prod) {
+    public void save(Product prod, MultipartFile productImage) throws IOException{
+    	
+    	if (productImage != null && !productImage.isEmpty()) {
+            String fileName = productImage.getOriginalFilename();
+            String uploadDir = "D:/Learn/Web Exercises/QuanLyCuaHangDoChoi/QuanLyCuaHangDoChoi/Images/Products";
+
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+            Files.copy(productImage.getInputStream(),
+                       uploadPath.resolve(fileName),
+                       StandardCopyOption.REPLACE_EXISTING);
+            prod.setImageUrl("/Images/Products/" + fileName);
+        }
+    	
+    	prod.setIsActive(true);
     	
     	Product savedProd = productRepository.save(prod); 
         
-        Integer brandId = savedProd.getBrand().getBrandId();
-        Integer categoryId = savedProd.getCategory().getCategoryId();
+    	String brandCode = brandService.getById(savedProd.getBrand().getBrandId()).getBrandCode();
+        String categoryCode = categoryService.getById(savedProd.getCategory().getCategoryId()).getCategoryCode();
         
-        String brandCode = brandService.getById(brandId).getBrandCode();
-        String categoryCode = categoryService.getById(categoryId).getCategoryCode();
-        
-        String generatedProductCode = String.format("%s-%s-%04d", brandCode, categoryCode, savedProd.getProductId());
-        
-        savedProd.setProductCode(generatedProductCode);
-        
+        savedProd.setProductCode(String.format("%s-%s-%04d", brandCode, categoryCode, savedProd.getProductId()));
+
         productRepository.save(savedProd);
     }
     

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import khanh.ntu.models.Order;
 import khanh.ntu.models.OrderDTO;
@@ -88,10 +89,15 @@ public class OrderController {
     }
 	
 	@PostMapping("/admin/order/create")
-    public String createOrder(@ModelAttribute("orderModel") OrderDTO orderDTO) {
-        orderService.save(orderDTO);
-        return "redirect:/admin/order";
-    }
+	public String createOrder(@ModelAttribute("orderModel") OrderDTO orderDTO,
+	                           ModelMap model) {
+	    if (orderDTO.getPaymentMethod() == null || orderDTO.getPaymentMethod().isBlank()) {
+	        model.addAttribute("orderModel", orderDTO);
+	        return "order_template/createOrder";
+	    }
+	    orderService.save(orderDTO);
+	    return "redirect:/admin/order";
+	}
 	
 	@GetMapping("/admin/order/{id}")
 	public String showOrderDetail(@PathVariable Integer id, ModelMap model) {
