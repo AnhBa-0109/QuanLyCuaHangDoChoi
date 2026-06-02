@@ -20,7 +20,15 @@ public class CustomUserDetailsService implements UserDetailsService{
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     	
         User user = userRepository.findByUsername(username);
-
+        
+        if (user == null) {
+            throw new UsernameNotFoundException("Không tìm thấy người dùng!");
+        }
+        
+        if (user.getIsActive() == false) {
+            throw new org.springframework.security.authentication.DisabledException("Tài khoản đã bị vô hiệu hóa!");
+        }
+        
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPasswordU())
