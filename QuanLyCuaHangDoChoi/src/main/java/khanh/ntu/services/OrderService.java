@@ -10,6 +10,7 @@ import khanh.ntu.models.OrderDetail;
 import khanh.ntu.models.OrderDetailDTO;
 import khanh.ntu.models.Product;
 import khanh.ntu.models.ProductSelectionDTO;
+import khanh.ntu.models.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,8 +72,11 @@ public class OrderService {
         order.setTotalAmount(total);
  
         if (dto.getUserId() != null) {
-            userRepository.findById(dto.getUserId())
-                .ifPresent(order::setUser);
+            Optional<User> userOptional = userRepository.findById(dto.getUserId());
+
+            if (userOptional.isPresent()) {
+                order.setUser(userOptional.get());
+            }
         }
  
         orderRepository.save(order);

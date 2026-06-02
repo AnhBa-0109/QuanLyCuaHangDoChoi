@@ -124,16 +124,7 @@ public class UserService {
     public void updateUserPassword(User user, String newPassword) {
         user.setPasswordU(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-    }
-    
-    public User login(String username, String password) {
-        User user = userRepository.findByUsername(username);
-        if (user != null && passwordEncoder.matches(password, user.getPasswordU())) {
-            return user;
-        }
-        return null;
-    }
-    
+    }    
 
     public long countActiveUsers() {
         return userRepository.findAll().stream()
