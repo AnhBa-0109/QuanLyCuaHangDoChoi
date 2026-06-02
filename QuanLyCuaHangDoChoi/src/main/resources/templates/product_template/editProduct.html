@@ -53,7 +53,7 @@
 		                                               bg-white dark:bg-gray-800
 		                                               focus:border-primary h-12 px-4
 		                                               text-base font-normal leading-normal
-		                                               transition-all cursor-pointer">
+		                                               transition-all cursor-pointer use-select2">
 		                                        <option value="">-- Chọn Brand --</option>
 		                                        <option th:each="b : ${brands}" th:value="${b.brandId}" th:text="${b.brandName}"></option>
 		                                    </select>
@@ -70,13 +70,10 @@
 		                                               bg-white dark:bg-gray-800
 		                                               focus:border-primary h-12 px-4
 		                                               text-base font-normal leading-normal
-		                                               transition-all cursor-pointer">
+		                                               transition-all cursor-pointer use-select2">
 		                                        <option value="">-- Chọn Category --</option>
 		                                        <option th:each="c : ${categories}" th:value="${c.categoryId}" th:text="${c.categoryName}"></option>
 		                                    </select>
-		                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#637588]">
-		                                        <span class="material-symbols-outlined">expand_more</span>
-		                                    </div>
 		                                </div>
 		                            </label>
 		                        </div>

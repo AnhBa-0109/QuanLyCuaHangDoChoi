@@ -13,11 +13,6 @@ import org.springframework.data.repository.query.Param;
 import khanh.ntu.models.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Integer>{
-	@Query("SELECT SUM(o.totalAmount) FROM Order o WHERE DATE(o.orderDate) = CURRENT_DATE AND o.status = true")
-	Double getTodayRevenue();
-
-	@Query("SELECT COUNT(o) FROM Order o WHERE DATE(o.orderDate) = CURRENT_DATE AND o.status = true")
-	Integer countTodayOrders();
 
 	@Query("SELECT FUNCTION('DATE_FORMAT', o.orderDate, '%d/%m') as label, SUM(o.totalAmount) as value " +
 	       "FROM Order o " +

@@ -33,10 +33,11 @@ public interface ProductRepository extends JpaRepository<Product, Integer>{
 	            Pageable pageable);
 	
 		@Query("SELECT new khanh.ntu.models.ProductSalesDTO(od.product, SUM(od.quantity)) " +
-	           "FROM OrderDetail od " +
-	           "WHERE od.product.isActive = true " +
-	           "GROUP BY od.product " +
-	           "ORDER BY SUM(od.quantity) DESC")
+				"FROM OrderDetail od " +
+		        "WHERE od.product.isActive = true " +
+		        "AND od.order.status = true " +
+		        "GROUP BY od.product " +
+		        "ORDER BY SUM(od.quantity) DESC")
 	    List<ProductSalesDTO> findTopSellingProducts(Pageable pageable);
 
 	    @Query("SELECT COUNT(p) FROM Product p WHERE p.isActive = true")

@@ -166,7 +166,7 @@ public class OrderService {
             LocalDateTime end = date.atTime(LocalTime.MAX);
 
             Double revenue = orderRepository.getRevenueBetween(start, end);
-            String label = date.format(formatter); // Ví dụ: "24/05"
+            String label = date.format(formatter);
             
             weekData.put(label, (revenue != null) ? revenue : 0.0);
         }
@@ -203,7 +203,7 @@ public class OrderService {
         LocalDate current = start;
         while (!current.isAfter(end)) {
             LocalDateTime startOfDay = current.atStartOfDay();
-            LocalDateTime endOfDay = current.atTime(java.time.LocalTime.MAX);
+            LocalDateTime endOfDay = current.atTime(LocalTime.MAX);
 
             Double revenue = orderRepository.getRevenueBetween(startOfDay, endOfDay);
             String label = current.format(formatter);

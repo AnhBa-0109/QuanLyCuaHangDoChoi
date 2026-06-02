@@ -1,0 +1,36 @@
+package khanh.ntu.controllers;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import khanh.ntu.Repositories.UserRepository;
+import khanh.ntu.models.User;
+
+@RestController
+public class MahoaPass {
+	 @Autowired
+	    private UserRepository userRepository;
+
+	    @Autowired
+	    private PasswordEncoder passwordEncoder;
+
+	    // Chỉ dùng 1 lần rồi XÓA đi!
+	    @GetMapping("/migrate-passwords")
+	    public String migratePasswords() {
+	        List<User> users = userRepository.findAll();
+	        
+	        for (User user : users) {
+	            // Kiểm tra nếu chưa mã hóa (BCrypt hash bắt đầu bằng $2a$)
+	            if (!user.getPasswordU().startsWith("$2a$")) {
+	                String encodedPassword = passwordEncoder.encode(user.getPasswordU());
+	                user.setPasswordU(encodedPassword);
+	                userRepository.save(user);
+	            }
+	        }
+	        return "Đã mã hóa " + users.size() + " mật khẩu thành công!";
+	    }
+}
