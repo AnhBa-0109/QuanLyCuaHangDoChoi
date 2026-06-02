@@ -14,13 +14,6 @@ import khanh.ntu.models.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Integer>{
 
-	@Query("SELECT FUNCTION('DATE_FORMAT', o.orderDate, '%d/%m') as label, SUM(o.totalAmount) as value " +
-	       "FROM Order o " +
-	       "WHERE o.orderDate >= :startDate AND o.status = true " +
-	       "GROUP BY FUNCTION('DATE_FORMAT', o.orderDate, '%d/%m') " +
-	       "ORDER BY label ASC")
-	List<Object[]> getRevenueChartData(Date startDate);
-
 	@Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.orderDate >= :start AND o.orderDate <= :end AND o.status = true")
 	Double getRevenueBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 

@@ -1,4 +1,4 @@
-package khanh.ntu.models;
+package khanh.ntu.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;

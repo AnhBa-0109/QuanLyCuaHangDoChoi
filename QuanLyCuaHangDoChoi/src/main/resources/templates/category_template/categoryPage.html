@@ -65,7 +65,7 @@
 														class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
 													<span class="material-symbols-outlined text-[20px]">edit</span>
 												</button>
-			                                    <button onclick="openDeleteModal(this.getAttribute('data-id'), 'brand')"
+			                                    <button onclick="openDeleteModal(this.dataset.id, 'brand')"
 			                                    		th:if="${currentUser.roleU == 'Admin'}"
 												        th:data-id="${b.brandId}"
 												        th:disabled="${brandProductCount != null && brandProductCount.getOrDefault(b.brandId, 0) > 0}"
@@ -127,7 +127,7 @@
 												        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
 												    <span class="material-symbols-outlined text-[20px]">edit</span>
 												</button>
-			                                    <button onclick="openDeleteModal(this.getAttribute('data-id'), 'category')"
+			                                    <button onclick="openDeleteModal(this.dataset.id, 'category')"
 			                                    		th:if="${currentUser.roleU == 'Admin'}"
 			                                            th:data-id="${c.categoryId}"
 												        th:disabled="${categoryProductCount != null && categoryProductCount.getOrDefault(c.categoryId, 0) > 0}"

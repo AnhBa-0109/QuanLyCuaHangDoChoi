@@ -7,5 +7,5 @@ import khanh.ntu.models.Brand;
 public interface BrandRepository extends JpaRepository<Brand, Integer>{
 
 	boolean existsByBrandCode(String brandCode);
-    boolean existsByBrandCodeAndBrandIdNot(String brandCode, Integer integer);
+    boolean existsByBrandCodeAndBrandIdNot(String brandCode, Integer brandId);
 }
